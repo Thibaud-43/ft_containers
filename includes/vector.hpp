@@ -16,6 +16,8 @@ public:
 	typedef	typename vector::value_type						value_type;
 	typedef	value_type*										pointer_type;
 	typedef	value_type&										reference_type;
+	typedef value_type const * 								const_pointer;
+	typedef value_type const & 								const_reference;
 
 	vectorIterator(void): m_ptr(nullptr)
 	{
@@ -29,7 +31,7 @@ public:
 	~vectorIterator()
 	{
 	}
-	
+
 	vectorIterator & operator= (vectorIterator const & rhs) 
 	{
 		m_ptr = rhs.m_ptr;
@@ -51,8 +53,9 @@ public:
 		m_ptr--;
 		return *this;
 	}
-	vectorIterator	operator-- (int) 
+	vectorIterator	operator--(int) 
 	{
+
 		vectorIterator	tmp(*this);
 		m_ptr--;
 		return tmp;
@@ -81,7 +84,62 @@ public:
 			return false;
 		return true;
 	}
+	vectorIterator &operator+=(int n)
+	{
+		while (n < 0)
+		{
+			(*this)--;
+			n++;
+		}
+		while (n > 0)
+		{
+			(*this)++;
+			n--;
+		}
+		return (*this);
+	};
+	vectorIterator &operator-=(int n)
+	{
 
+		while (n > 0)
+		{
+			operator--();	
+			n--;
+		}
+		while (n < 0)
+		{
+			operator++();
+			n++;
+		}
+		return (*this);
+	};
+	vectorIterator operator+(int n) const
+	{
+		vectorIterator tmp(*this);
+		tmp += n;
+		return (tmp);
+	};
+	vectorIterator operator-(int n) const
+	{
+		vectorIterator tmp(*this);
+
+		tmp -= n;
+		return (tmp);
+	};
+	std::ptrdiff_t	operator-(vectorIterator & rhs) const
+	{
+		return m_ptr - rhs.m_ptr;
+	}
+	const_reference operator[](int nb) const 
+	{
+		return (*(this->m_ptr + nb));
+	}
+	const_reference operator*() const {
+		return (*this->m_ptr);
+	}
+	const_pointer operator->() const {
+		return (this->m_ptr);
+	}
 	private:
 		pointer_type		m_ptr;
 };
@@ -99,8 +157,12 @@ public:
 
 	typedef	size_t						size_type;
 	typedef	T							value_type;
+	typedef	value_type	&				reference;
+	typedef	value_type const &			const_reference;
 	typedef Alloc						allocator_type;
-	typedef vectorIterator<vector <T> >	Iterator;
+	typedef vectorIterator<vector <T> >	iterator;
+	typedef ReverseIterator<iterator>	reverse_iterator;
+
 
 /***********************************************************************************************************************************
 *															CONSTRUCTORS																
@@ -110,17 +172,47 @@ public:
 	{
 	}
 
-	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): 
-	m_alloc(alloc)
+	explicit vector (int n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): 
+	m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)
 	{
 		this->assign(n, val);
 	}
+	template <class InputIterator>
+    vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()):
+	m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)
+	{
+		this->assign(first, last);
+	}
 
-	/*template <class InputIterator>
-    vector (InputIterator first, InputIterator last,
-                 const allocator_type& alloc = allocator_type());
+	vector (const vector & x): m_data(nullptr), m_size(0), m_capacity(0), m_alloc(x.m_alloc)
+	{
+		this->assign(x.begin(), x.end());
+	}
+/***********************************************************************************************************************************
+*															OVERLOADS															
+***********************************************************************************************************************************/
 
-	vector (const vector& x);*/
+	reference operator[] (size_type n)
+	{
+		return *(this->begin() + n);
+	}
+	const_reference operator[] (size_type n) const
+	{
+		return *(this->begin() + n);
+	}
+	vector &operator=(const vector &other)
+	{
+		m_size = 0;
+		m_capacity = other.m_capacity;
+		m_alloc = other.m_alloc;
+		m_alloc.deallocate(m_data, m_capacity);
+		m_data = m_alloc.allocate(m_capacity);
+		for (iterator it = other.begin(); it != other.end(); it++)
+		{
+			this->push_back(*it);
+		}
+		return *this;
+	}
 
 /***********************************************************************************************************************************
 *															DESTRUCTORS															
@@ -134,6 +226,25 @@ public:
 /***********************************************************************************************************************************
 *															MEMBERS FUNCTIONS																
 ***********************************************************************************************************************************/
+
+	bool empty() const
+	{
+		if (m_size == 0)
+		{
+			return true;
+		}
+		return false;
+		
+	}
+
+	reference back()
+	{
+		return *(this->end()-1);
+	}
+	const_reference back() const
+	{
+		return *(this->end()-1);
+	}
 
 	value_type		getValue(size_type i) const
 	{
@@ -152,8 +263,16 @@ public:
 
 	void			push_back(const value_type & val)
 	{
+		int amount = 0;
 		if (m_capacity <= m_size)
-			ReAlloc(m_capacity * 2);
+		{
+			if (m_capacity == 0)
+				amount = 1;
+			else
+				amount = m_capacity * 2;
+			ReAlloc(amount);
+			m_capacity = amount;
+		}
 		m_data[m_size] = val;
 		m_size++;
 	}
@@ -170,28 +289,34 @@ public:
 	template <class InputIterator>
 	void assign (InputIterator first, InputIterator last)
 	{
-		static_cast<void>(first);
-		static_cast<void>(last);
+		m_alloc.deallocate(m_data, m_capacity);
+		m_capacity = last - first;
+		m_size = 0;
+		m_data = m_alloc.allocate(m_capacity);
+		for (iterator it = first; it != last; it++)
+		{
+			this->push_back(*it);
+		}
 	}
 
-	void assign (size_type n, const value_type& val)
+	void assign (int n, const value_type& val)
 	{
 		m_alloc.deallocate(m_data, m_capacity);
-		m_size = 0;
 		m_capacity = n;
+		m_size = 0;
 		m_data = m_alloc.allocate(m_capacity);
-		for (size_t i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 			this->push_back(val);
 	}
 
-	Iterator	begin()
+	iterator	begin() const
 	{
-		return Iterator(m_data);
+		return iterator(m_data);
 	}
 
-	Iterator	end()
+	iterator	end() const
 	{
-		return Iterator(m_data + m_size);
+		return iterator(m_data + m_size);
 	}
 	private:
 
@@ -220,7 +345,8 @@ public:
 			{
 				tmp[i] = m_data[i];
 			}
-			m_alloc.deallocate(m_data, m_capacity);
+			if(m_data != nullptr)
+				m_alloc.deallocate(m_data, m_capacity);
 			m_data = tmp;
 			m_capacity = newCapacity;
 		}

@@ -1,15 +1,15 @@
-SRCS		=	main.cpp		\
+SRCS		=	mainVector.cpp		\
 
 
-NAME	= a.out
+NAME	= vector
 
-CXX		= clang++ -g -fsanitize=address
+CXX		= clang++
 CXXFLAGS = -Wall -Wextra -Werror 
 
 RM		= rm -rf
 
 SRCS_PATH	=	./
-OBJS_PATH	=	objs/
+OBJS_PATH	=	.objs/
 INC			= -I includes/
 
 
