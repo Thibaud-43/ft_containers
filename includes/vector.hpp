@@ -1,19 +1,23 @@
 #ifndef Vector_H
  #define Vector_H
 
+#include <ReverseIterator.hpp>
 #include <string>
+#include <limits>
 #include <iostream>
 #include <memory>
+
+
 
 namespace ft
 {
 
-template<typename vector>
+template<typename T>
 class vectorIterator
 {
 
 public:
-	typedef	typename vector::value_type						value_type;
+	typedef	T												value_type;
 	typedef	value_type*										pointer_type;
 	typedef	value_type&										reference_type;
 	typedef value_type const * 								const_pointer;
@@ -28,7 +32,7 @@ public:
 	vectorIterator(vectorIterator const & src): m_ptr(src.m_ptr)
 	{
 	}
-	~vectorIterator()
+	virtual ~vectorIterator()
 	{
 	}
 
@@ -39,13 +43,13 @@ public:
 	}
 	vectorIterator & operator++ (void) 
 	{
-		m_ptr++;
+		++this->m_ptr;
 		return *this;
 	}
 	vectorIterator 	operator++ (int) 
 	{
 		vectorIterator	tmp(*this);
-		m_ptr++;
+		++this->m_ptr;
 		return tmp;
 	}
 	vectorIterator & operator-- (void) 
@@ -70,7 +74,7 @@ public:
 	}
 	reference_type	operator*()
 	{
-		return *m_ptr;
+		return (*this->m_ptr);
 	}
 	bool			operator== (const vectorIterator ptr) const
 	{
@@ -140,7 +144,19 @@ public:
 	const_pointer operator->() const {
 		return (this->m_ptr);
 	}
-	private:
+	bool operator<(vectorIterator const &other) const {
+		return (this->m_ptr < other.m_ptr);
+	}
+	bool operator<=(vectorIterator const &other) const {
+		return (this->m_ptr <= other.m_ptr);
+	}
+	bool operator>(vectorIterator const &other) const {
+		return (this->m_ptr > other.m_ptr);
+	}
+	bool operator>=(vectorIterator const &other) const {
+		return (this->m_ptr >= other.m_ptr);
+	}
+	protected:
 		pointer_type		m_ptr;
 };
 
@@ -154,18 +170,23 @@ public:
 /***********************************************************************************************************************************
 *															TYPEDEF																
 ***********************************************************************************************************************************/
+	typedef	T									value_type;
+	typedef Alloc								allocator_type;
+	typedef	value_type	&						reference;
+	typedef	value_type const &					const_reference;
+	typedef	value_type	*						pointer;
+	typedef	value_type const *					const_pointer;
+	typedef vectorIterator<value_type>			iterator;
+	typedef vectorIterator<value_type> 			const_iterator;
+	typedef ReverseIterator<iterator> 			reverse_iterator;
+	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
+	typedef std::ptrdiff_t 						difference_type;
+	typedef	size_t								size_type;
 
-	typedef	size_t						size_type;
-	typedef	T							value_type;
-	typedef	value_type	&				reference;
-	typedef	value_type const &			const_reference;
-	typedef Alloc						allocator_type;
-	typedef vectorIterator<vector <T> >	iterator;
-	typedef ReverseIterator<iterator>	reverse_iterator;
 
 
 /***********************************************************************************************************************************
-*															CONSTRUCTORS																
+*															CONSTRUCTORS / DESTRUCTORS														
 ***********************************************************************************************************************************/
 
 	explicit vector (const allocator_type& alloc = allocator_type()): m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)   
@@ -188,18 +209,12 @@ public:
 	{
 		this->assign(x.begin(), x.end());
 	}
-/***********************************************************************************************************************************
-*															OVERLOADS															
-***********************************************************************************************************************************/
 
-	reference operator[] (size_type n)
+	~vector()
 	{
-		return *(this->begin() + n);
-	}
-	const_reference operator[] (size_type n) const
-	{
-		return *(this->begin() + n);
-	}
+		m_alloc.deallocate(m_data, m_capacity);
+	};
+
 	vector &operator=(const vector &other)
 	{
 		m_size = 0;
@@ -215,17 +230,71 @@ public:
 	}
 
 /***********************************************************************************************************************************
-*															DESTRUCTORS															
+*															ITERATORS																
 ***********************************************************************************************************************************/
 
-	~vector()
+	iterator	begin()
 	{
-		m_alloc.deallocate(m_data, m_capacity);
-	};
+		return iterator(m_data);
+	}
+	const_iterator	begin() const
+	{
+		return const_iterator(m_data);
+	}
+
+	iterator	end()
+	{
+		return iterator(m_data + m_size);
+	}
+
+	const_iterator	end() const
+	{
+		return const_iterator(m_data + m_size);
+	}
+
+	reverse_iterator	rbegin()
+	{
+		return reverse_iterator(m_data + m_size);
+	}
+	const_reverse_iterator	rbegin() const
+	{
+		return const_reverse_iterator(m_data + m_size);
+	}
+	reverse_iterator	rend()
+	{
+		return reverse_iterator(m_data);
+	}
+	const_reverse_iterator	rend() const
+	{
+		return const_reverse_iterator(m_data);
+	}
 
 /***********************************************************************************************************************************
-*															MEMBERS FUNCTIONS																
+*															CAPACITY																
 ***********************************************************************************************************************************/
+	
+	size_type		size(void) const
+	{
+		return m_size;
+	}
+
+	size_type max_size() const
+	{
+		return (m_alloc.max_size());
+	}
+
+	void resize (size_type n, value_type val = value_type())
+	{
+		while (n < m_size)
+			pop_back();
+		while(n > m_size)
+			push_back(val);
+		
+	}
+	size_type		capacity(void) const
+	{
+		return m_capacity;
+	}
 
 	bool empty() const
 	{
@@ -236,7 +305,52 @@ public:
 		return false;
 		
 	}
+	void reserve (size_type n)
+	{
+		T	*tmp;
+		if (n > m_capacity)
+		{
+			tmp = m_alloc.allocate(n);
+			for (size_t i = 0; i < m_size; i++)
+				tmp[i] = m_data[i];
+			m_alloc.deallocate(m_data, m_capacity);
+			m_data = tmp;
+			m_capacity = n;
+		}
+	}
 
+/***********************************************************************************************************************************
+*															ELEMENT ACCESS																
+***********************************************************************************************************************************/
+	
+	reference operator[] (size_type n)
+	{
+		return *(this->begin() + n);
+	}
+	const_reference operator[] (size_type n) const
+	{
+		return *(this->begin() + n);
+	}
+	reference at (size_type n)
+	{
+		if (n >= this->m_size)
+			throw (std::out_of_range("out of range"));
+		return (this->m_data[n]);
+	}
+	const_reference at (size_type n) const
+	{
+		if (n >= this->m_size)
+			throw (std::out_of_range("out of range"));
+		return (this->m_data[n]);
+	}
+	reference front()
+	{
+		return m_data[0];
+	}
+	const_reference front() const
+	{
+		return m_data[0];
+	}
 	reference back()
 	{
 		return *(this->end()-1);
@@ -246,46 +360,11 @@ public:
 		return *(this->end()-1);
 	}
 
-	value_type		getValue(size_type i) const
-	{
-		return m_data[i];
-	}
 
-	size_type		capacity(void) const
-	{
-		return m_capacity;
-	}
-
-	size_type		size(void) const
-	{
-		return m_size;
-	}
-
-	void			push_back(const value_type & val)
-	{
-		int amount = 0;
-		if (m_capacity <= m_size)
-		{
-			if (m_capacity == 0)
-				amount = 1;
-			else
-				amount = m_capacity * 2;
-			ReAlloc(amount);
-			m_capacity = amount;
-		}
-		m_data[m_size] = val;
-		m_size++;
-	}
-
-	void			pop_back(void)
-	{
-		if (m_size > 0)
-		{
-			m_size--;
-			m_data[m_size].~value_type();
-		}
-	}
-
+/***********************************************************************************************************************************
+*															MODIFIERS																
+***********************************************************************************************************************************/
+	
 	template <class InputIterator>
 	void assign (InputIterator first, InputIterator last)
 	{
@@ -309,49 +388,155 @@ public:
 			this->push_back(val);
 	}
 
-	iterator	begin() const
+	void			push_back(const value_type & val)
 	{
-		return iterator(m_data);
+		int amount = 0;
+		if (m_capacity <= m_size)
+		{
+			if (m_capacity == 0)
+				amount = 1;
+			else
+				amount = m_capacity * 2;
+			reserve(amount);
+			m_capacity = amount;
+		}
+		m_data[m_size] = val;
+		m_size++;
 	}
 
-	iterator	end() const
+	void			pop_back(void)
 	{
-		return iterator(m_data + m_size);
+		if (m_size > 0)
+		{
+			m_size--;
+			m_data[m_size].~value_type();
+		}
 	}
-	private:
+	iterator insert (iterator position, const value_type& val)
+	{
+		size_type		i = 0;
+		iterator		it = begin();
+
+		while (it + i != position && i < m_size)
+			i++;
+		if (m_capacity < m_size + 1)
+			reserve(m_size + 1);
+
+		size_type	k = m_capacity - 1;
+
+		while (k > i)
+		{
+			m_data[k] = m_data[k - 1];
+			k--;
+		}
+
+		m_data[i] = val;
+		m_size++;
+		return (iterator(&m_data[i]));
+	}
+
+	void insert (iterator position, int n, const value_type& val)
+	{
+		while (n--)
+			position = insert(position, val);
+		
+	}
+
+	template <class InputIterator>
+	void insert (iterator position, InputIterator first, InputIterator last)
+	{
+		while (first != last)
+		{
+			position = insert(position, (*first)) + 1;
+			++first;
+		}
+	}
+	/*iterator erase (iterator position)
+	{
+
+	}
+	iterator erase (iterator first, iterator last)
+	{
+
+	}
+	void swap (vector& x)
+	{
+
+	}
+	void clear()
+	{
+
+	}*/
+
+/***********************************************************************************************************************************
+*															ALLOCATOR																
+***********************************************************************************************************************************/
+	
+	allocator_type get_allocator() const
+	{
+		return m_alloc;
+	}
 
 /***********************************************************************************************************************************
 *															PRIVATE ATTRIBUTES																
 ***********************************************************************************************************************************/
-
+	
+	private :
 		T				*m_data;
 		size_type		m_size;
 		size_type		m_capacity;
 		allocator_type	m_alloc;
 		
 
+};
 
 /***********************************************************************************************************************************
-*															PRIVATE MEMBERS FUNCTIONS																
+*															NON MEMBERS FUNCTIONS OVERLOADS														
 ***********************************************************************************************************************************/
 
-		void	ReAlloc(size_type newCapacity)
-		{
-			T	*tmp;
-			if (newCapacity < m_capacity)
-				m_size = newCapacity;
-			tmp = m_alloc.allocate(newCapacity);
-			for (size_t i = 0; i < m_size; i++)
-			{
-				tmp[i] = m_data[i];
-			}
-			if(m_data != nullptr)
-				m_alloc.deallocate(m_data, m_capacity);
-			m_data = tmp;
-			m_capacity = newCapacity;
-		}
+	/*template <class T, class Alloc>
+	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
 
-};
+	}
+
+	template <class T, class Alloc>
+	bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+
+	}
+
+	template <class T, class Alloc>
+	bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+
+	}
+
+
+	template <class T, class Alloc>
+	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+
+	}
+
+
+	template <class T, class Alloc>
+	bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+
+	}
+
+
+	template <class T, class Alloc>
+	bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+
+	}
+	template <class T, class Alloc>
+	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+	{
+
+	}*/
 
 template<typename T>
 std::ostream	&	operator<<(std::ostream & o, vector<T> & rhs)
