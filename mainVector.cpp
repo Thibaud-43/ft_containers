@@ -1,14 +1,61 @@
 #include <vector.hpp>
 #include <vector>
+#include <ctime>
 #include <testClass.hpp>
 
+class Time
+{
+private:
+	clock_t		m_begin_std;
+	clock_t		m_end_std;
+	clock_t		m_begin_ft;
+	clock_t		m_end_ft;
+public:
+	Time(/* args */){};
+	~Time(){};
+
+	void	setBeginStd(void)
+	{
+		m_begin_std = clock();
+	}
+	void	setBeginFt(void)
+	{
+		m_begin_ft = clock();
+	}
+	void	printStdTime(void)
+	{
+		m_end_std = clock();
+		std::cout << "Total time elapsed: " << m_end_std - m_begin_std << std::endl << std::endl;
+	}
+
+	void	printFtTime(void)
+	{
+		m_end_ft = clock();
+		if (m_end_ft - m_begin_ft < 20 * (m_end_std - m_begin_std))
+		{
+			std::cout << "\033[1;32m";
+			std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
+			std::cout << "\033[0m\n";
+		}
+		else
+		{
+			std::cout << "\033[1;31m";
+			std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
+			std::cout << "\033[0m\n";
+		}
+	}
+};
 
 
 int main(void)
 {
+	Time	clock;
+
+
 
 	std::cout << "TEST CONSTRUCTORS" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
 		using namespace std;
 		// constructors used in the same order as described above:
 		vector<int> first;                                // empty vector of ints
@@ -23,8 +70,10 @@ int main(void)
 		for (vector<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
 			cout << ' ' << *it;
 		cout << '\n';
+		clock.printStdTime();
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		// constructors used in the same order as described above:
 		vector<int> first;                                	// empty vector of ints
@@ -39,11 +88,13 @@ int main(void)
 		for (vector<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST EGAL" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
 		using namespace std;
 		vector<int> foo (3,0);
 		vector<int> bar (5,0);
@@ -53,8 +104,11 @@ int main(void)
 
 		cout << "Size of foo: " << int(foo.size()) << '\n';
 		cout << "Size of bar: " << int(bar.size()) << '\n';
+		clock.printStdTime();
+
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> foo (3,0);
 		vector<int> bar (5,0);
@@ -65,12 +119,14 @@ int main(void)
 		std::cout << "Size of foo: " << int(foo.size()) << '\n';
 		std::cout << "Size of bar: " << int(bar.size()) << '\n';
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 
 	std::cout << "TEST BEGIN ET END" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
 		using namespace std;
 		vector<int> myvector;
 		for (int i=1; i<=5; i++) myvector.push_back(i);
@@ -79,8 +135,11 @@ int main(void)
 		for (vector<int>::iterator it = myvector.begin() ; it != myvector.end(); ++it)
 			cout << ' ' << *it;
 		cout << '\n';
+		clock.printStdTime();
+
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 		for (int i=1; i<=5; i++) myvector.push_back(i);
@@ -89,11 +148,14 @@ int main(void)
 		for (vector<int>::iterator it = myvector.begin() ; it != myvector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST RBEGIN ET REND" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector (5);  // 5 default-constructed ints
 
 		int i=0;
@@ -106,8 +168,11 @@ int main(void)
 		for (std::vector<int>::iterator it = myvector.begin(); it != myvector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
+		clock.printStdTime();
+
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector (5);  // 5 default-constructed ints
 
@@ -122,12 +187,15 @@ int main(void)
 		for (vector<int>::iterator it = myvector.begin(); it != myvector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 
 	std::cout << "TEST SIZE" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myints;
 		std::cout << "0. size: " << myints.size() << '\n';
 
@@ -139,8 +207,11 @@ int main(void)
 
 		myints.pop_back();
 		std::cout << "3. size: " << myints.size() << '\n';
+		clock.printStdTime();
+
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myints;
 		std::cout << "0. size: " << myints.size() << '\n';
@@ -153,12 +224,15 @@ int main(void)
 
 		myints.pop_back();
 		std::cout << "3. size: " << myints.size() << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 
 	std::cout << "TEST MAX SIZE" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 
 		// set some content in the vector:
@@ -167,9 +241,12 @@ int main(void)
 		std::cout << "size: " << myvector.size() << "\n";
 		std::cout << "capacity: " << myvector.capacity() << "\n";
 		std::cout << "max_size: " << myvector.max_size() << "\n";
+		clock.printStdTime();
+
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 
@@ -179,11 +256,14 @@ int main(void)
 		std::cout << "size: " << myvector.size() << "\n";
 		std::cout << "capacity: " << myvector.capacity() << "\n";
 		std::cout << "max_size: " << myvector.max_size() << "\n";
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST RESIZE" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 
 		// set some initial content:
@@ -197,9 +277,12 @@ int main(void)
 		for (size_t i=0;i<myvector.size();i++)
 			std::cout << ' ' << myvector[i];
 		std::cout << '\n';
+		clock.printStdTime();
+
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 
@@ -214,11 +297,14 @@ int main(void)
 		for (size_t i=0;i<myvector.size();i++)
 			std::cout << ' ' << myvector[i];
 		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST CAPACITY" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 
 		// set some content in the vector:
@@ -227,9 +313,12 @@ int main(void)
 		std::cout << "size: " << (int) myvector.size() << '\n';
 		std::cout << "capacity: " << (int) myvector.capacity() << '\n';
 		std::cout << "max_size: " << (int) myvector.max_size() << '\n';
+		clock.printStdTime();
+
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 
@@ -240,11 +329,14 @@ int main(void)
 		std::cout << "capacity: " << (int) myvector.capacity() << '\n';
 		std::cout << "max_size: " << (int) myvector.max_size() << '\n';
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST EMPTY" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 		int sum (0);
 
@@ -257,9 +349,12 @@ int main(void)
 		}
 
 		std::cout << "total: " << sum << '\n';
+		clock.printStdTime();
+
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 		int sum (0);
@@ -273,12 +368,15 @@ int main(void)
 		}
 
 		std::cout << "total: " << sum << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 
 	std::cout << "TEST RESERVE" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int>::size_type sz;
 
 		std::vector<int> foo;
@@ -303,8 +401,11 @@ int main(void)
 			std::cout << "capacity changed: " << sz << '\n';
 			}
 		}
+		clock.printStdTime();
+
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int>::size_type sz;
 
@@ -330,12 +431,15 @@ int main(void)
 			std::cout << "capacity changed: " << sz << '\n';
 			}
 		}
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 
 	std::cout << "TEST []" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector (10);   // 10 zero-initialized elements
 
 		std::vector<int>::size_type sz = myvector.size();
@@ -356,8 +460,11 @@ int main(void)
 		for (unsigned i=0; i<sz; i++)
 			std::cout << ' ' << myvector[i];
 		std::cout << '\n';
+		clock.printStdTime();
+
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector (10);   // 10 zero-initialized elements
 
@@ -380,11 +487,14 @@ int main(void)
 			std::cout << ' ' << myvector[i];
 		std::cout << '\n';
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST AT" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector (10);   // 10 zero-initialized ints
 
 		// assign some values:
@@ -395,9 +505,12 @@ int main(void)
 		for (unsigned i=0; i<myvector.size(); i++)
 			std::cout << ' ' << myvector.at(i);
 		std::cout << '\n';
+		clock.printStdTime();
+
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector (10);   // 10 zero-initialized ints
 
@@ -409,10 +522,13 @@ int main(void)
 		for (unsigned i=0; i<myvector.size(); i++)
 			std::cout << ' ' << myvector.at(i);
 		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 	std::cout << "TEST FRONT" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 
 		myvector.push_back(78);
@@ -424,9 +540,11 @@ int main(void)
 
 		std::cout << "myvector.front() is now " << myvector.front() << '\n';
 
+		clock.printStdTime();
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 
@@ -439,11 +557,14 @@ int main(void)
 
 		std::cout << "myvector.front() is now " << myvector.front() << '\n';
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST BACK" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 
 		myvector.push_back(10);
@@ -458,8 +579,10 @@ int main(void)
 			std::cout << ' ' << myvector[i];
 		std::cout << '\n';
 
+		clock.printStdTime();
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 
@@ -475,6 +598,7 @@ int main(void)
 			std::cout << ' ' << myvector[i];
 		std::cout << '\n';
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
@@ -483,6 +607,8 @@ int main(void)
 
 	std::cout << "TEST ASSIGN" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		using namespace std;
 		vector<int> first;
 		vector<int> second;
@@ -505,8 +631,10 @@ int main(void)
 		cout << "Capacity of first: " << int (first.capacity()) << '\n';
 		cout << "Capacity of second: " << int (second.capacity()) << '\n';
 		cout << "Capacity of third: " << int (third.capacity()) << '\n';
+		clock.printStdTime();
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> first;
 		vector<int> second;
@@ -530,12 +658,15 @@ int main(void)
 		std::cout << "Capacity of first: " << int (first.capacity()) << '\n';
 		std::cout << "Capacity of second: " << int (second.capacity()) << '\n';
 		std::cout << "Capacity of third: " << int (third.capacity()) << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 
 	std::cout << "TEST PUSH BACK" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 		int myint;
 
@@ -547,8 +678,10 @@ int main(void)
 		} while (myint);
 
 		std::cout << "myvector stores " << int(myvector.size()) << " numbers.\n";
+		clock.printStdTime();
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 		int myint;
@@ -561,6 +694,7 @@ int main(void)
 		} while (myint);
 
 		std::cout << "myvector stores " << int(myvector.size()) << " numbers.\n";
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
@@ -570,6 +704,8 @@ int main(void)
 
 	std::cout << "TEST POP BACK" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector;
 		int sum (0);
 		myvector.push_back (100);
@@ -584,8 +720,10 @@ int main(void)
 
 		std::cout << "The elements of myvector add up to " << sum << '\n';
 
+		clock.printStdTime();
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector;
 		int sum (0);
@@ -601,13 +739,14 @@ int main(void)
 
 		std::cout << "The elements of myvector add up to " << sum << '\n';
 
+		clock.printFtTime();
 	}
-	std::cout << std::endl << std::endl;
-
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST INSERT" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+
 		std::vector<int> myvector (3,100);
 		std::vector<int>::iterator it;
 
@@ -629,8 +768,10 @@ int main(void)
 		for (it=myvector.begin(); it<myvector.end(); it++)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
+		clock.printStdTime();
 	}
 	{
+		clock.setBeginFt();
 		using namespace ft;
 		vector<int> myvector (3,100);
 		vector<int>::iterator it;
@@ -653,69 +794,215 @@ int main(void)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST ERASE" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
+		std::vector<int> myvector;
+
+		// set some values (from 1 to 10)
+		for (int i=1; i<=10; i++) myvector.push_back(i);
+
+		// erase the 6th element
+		myvector.erase (myvector.begin()+5);
+
+		// erase the first 3 elements:
+		myvector.erase (myvector.begin(),myvector.begin()+3);
+
+		std::cout << "myvector contains:";
+		for (unsigned i=0; i<myvector.size(); ++i)
+			std::cout << ' ' << myvector[i];
+		std::cout << '\n';
+		clock.printStdTime();
 		
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
+		vector<int> myvector;
 
+		// set some values (from 1 to 10)
+		for (int i=1; i<=10; i++) myvector.push_back(i);
+
+		// erase the 6th element
+		myvector.erase (myvector.begin()+5);
+
+		// erase the first 3 elements:
+		myvector.erase (myvector.begin(),myvector.begin()+3);
+
+		std::cout << "myvector contains:";
+		for (unsigned i=0; i<myvector.size(); ++i)
+			std::cout << ' ' << myvector[i];
+		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST SWAP" << std::endl << std::endl;
 	{
-		
+		clock.setBeginStd();
+		std::vector<int> foo (3,100);   // three ints with a value of 100
+		std::vector<int> bar (5,200);   // five ints with a value of 200
+
+		foo.swap(bar);
+
+		std::cout << "foo contains:";
+		for (unsigned i=0; i<foo.size(); i++)
+			std::cout << ' ' << foo[i];
+		std::cout << '\n';
+
+		std::cout << "bar contains:";
+		for (unsigned i=0; i<bar.size(); i++)
+			std::cout << ' ' << bar[i];
+		std::cout << '\n';
+		clock.printStdTime();
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
+		vector<int> foo (3,100);   // three ints with a value of 100
+		vector<int> bar (5,200);   // five ints with a value of 200
 
+		foo.swap(bar);
+
+		std::cout << "foo contains:";
+		for (unsigned i=0; i<foo.size(); i++)
+			std::cout << ' ' << foo[i];
+		std::cout << '\n';
+
+		std::cout << "bar contains:";
+		for (unsigned i=0; i<bar.size(); i++)
+			std::cout << ' ' << bar[i];
+		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
 	std::cout << "TEST CLEAR" << std::endl << std::endl;
 	{
-		
+		clock.setBeginStd();
+		std::vector<int> myvector;
+		myvector.push_back (100);
+		myvector.push_back (200);
+		myvector.push_back (300);
+
+		std::cout << "myvector contains:";
+		for (unsigned i=0; i<myvector.size(); i++)
+			std::cout << ' ' << myvector[i];
+		std::cout << '\n';
+
+		myvector.clear();
+		myvector.push_back (1101);
+		myvector.push_back (2202);
+
+		std::cout << "myvector contains:";
+		for (unsigned i=0; i<myvector.size(); i++)
+			std::cout << ' ' << myvector[i];
+		std::cout << '\n';	
+		clock.printStdTime();
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
+		vector<int> myvector;
+		myvector.push_back (100);
+		myvector.push_back (200);
+		myvector.push_back (300);
 
+		std::cout << "myvector contains:";
+		for (unsigned i=0; i<myvector.size(); i++)
+			std::cout << ' ' << myvector[i];
+		std::cout << '\n';
+
+		myvector.clear();
+		myvector.push_back (1101);
+		myvector.push_back (2202);
+
+		std::cout << "myvector contains:";
+		for (unsigned i=0; i<myvector.size(); i++)
+			std::cout << ' ' << myvector[i];
+		std::cout << '\n';
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 	std::cout << "TEST GET ALLOCATOR" << std::endl << std::endl;
 	{
-		
+		clock.setBeginStd();
+		std::vector<int> myvector;
+		int * p;
+		unsigned int i;
+
+		// allocate an array with space for 5 elements using vector's allocator:
+		p = myvector.get_allocator().allocate(5);
+
+		// construct values in-place on the array:
+			for (i=0; i<5; i++) myvector.get_allocator().construct(&p[i],i);
+
+		std::cout << "The allocated array contains:";
+		for (i=0; i<5; i++) std::cout << ' ' << p[i];
+			std::cout << '\n';
+
+		// destroy and deallocate:
+		for (i=0; i<5; i++) myvector.get_allocator().destroy(&p[i]);
+		myvector.get_allocator().deallocate(p,5);		
+		clock.printStdTime();
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
+		vector<int> myvector;
+		int * p;
+		unsigned int i;
 
+		// allocate an array with space for 5 elements using vector's allocator:
+		p = myvector.get_allocator().allocate(5);
+
+		// construct values in-place on the array:
+		for (i=0; i<5; i++) myvector.get_allocator().construct(&p[i],i);
+
+		std::cout << "The allocated array contains:";
+		for (i=0; i<5; i++) std::cout << ' ' << p[i];
+			std::cout << '\n';
+
+		// destroy and deallocate:
+		for (i=0; i<5; i++) myvector.get_allocator().destroy(&p[i]);
+			myvector.get_allocator().deallocate(p,5);	
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 	std::cout << "TEST RELATIONAL OPERATORS" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
 		
+		clock.printStdTime();
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 	std::cout << "TEST SWAP" << std::endl << std::endl;
 	{
+		clock.setBeginStd();
 		
+		clock.printStdTime();
 	}
 
 	{
+		clock.setBeginFt();
 		using namespace ft;
 
+		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 	return 0;

@@ -451,22 +451,44 @@ public:
 			++first;
 		}
 	}
-	/*iterator erase (iterator position)
+	iterator erase (iterator position)
 	{
-
+		return (erase(position, position + 1));
 	}
 	iterator erase (iterator first, iterator last)
 	{
-
+		size_type		posToInsert = 0;
+		for (iterator i = begin(); i != first; i++)
+			posToInsert++;
+		size_type		nb = 0;
+		for (iterator i = first; i != last; i++)
+			nb++;
+		for (size_type i = 0; i < m_size - nb; i++)
+			m_data[i + posToInsert] = m_data[i + posToInsert + nb];
+		for(size_type i = 0; i < nb; i++)
+			pop_back();
+		return (begin() + posToInsert);
 	}
+
 	void swap (vector& x)
 	{
-
+		size_type		tmpSize = this->m_size;
+		size_type		tmpCapacity = this->m_capacity;
+		pointer			tmpData = this->m_data;
+		
+		this->m_size = x.m_size;
+		this->m_capacity = x.m_capacity;
+		this->m_data = x.m_data;
+		x.m_size = tmpSize;
+		x.m_capacity = tmpCapacity;
+		x.m_data = tmpData;
 	}
+
 	void clear()
 	{
-
-	}*/
+		while(this->m_size)
+			pop_back();
+	}
 
 /***********************************************************************************************************************************
 *															ALLOCATOR																
