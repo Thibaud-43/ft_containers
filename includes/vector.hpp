@@ -2,6 +2,7 @@
  #define Vector_H
 
 #include <ReverseIterator.hpp>
+#include <IteratorTraits.hpp>
 #include <string>
 #include <limits>
 #include <iostream>
@@ -18,15 +19,17 @@ class vectorIterator
 
 public:
 	typedef	T												value_type;
-	typedef	value_type*										pointer_type;
-	typedef	value_type&										reference_type;
+	typedef	value_type*										pointer;
+	typedef	value_type&										reference;
 	typedef value_type const * 								const_pointer;
 	typedef value_type const & 								const_reference;
+	typedef ptrdiff_t										difference_type;
+	typedef std::forward_iterator_tag						iterator_category;
 
 	vectorIterator(void): m_ptr(nullptr)
 	{
 	}
-	vectorIterator(pointer_type ptr): m_ptr(ptr)
+	vectorIterator(pointer ptr): m_ptr(ptr)
 	{
 	}
 	vectorIterator(vectorIterator const & src): m_ptr(src.m_ptr)
@@ -64,15 +67,15 @@ public:
 		m_ptr--;
 		return tmp;
 	}
-	reference_type	operator[](int index)
+	reference	operator[](int index)
 	{
 		return *(m_ptr + index);
 	}
-	pointer_type	operator->()
+	pointer	operator->()
 	{
 		return m_ptr;
 	}
-	reference_type	operator*()
+	reference	operator*()
 	{
 		return (*this->m_ptr);
 	}
@@ -157,7 +160,7 @@ public:
 		return (this->m_ptr >= other.m_ptr);
 	}
 	protected:
-		pointer_type		m_ptr;
+		pointer		m_ptr;
 };
 
 
@@ -198,8 +201,12 @@ public:
 	{
 		this->assign(n, val);
 	}
+	/*template <class InputIterator>
+    vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()):*/
 	template <class InputIterator>
-    vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()):
+    vector (InputIterator first, 
+	typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last, 
+	const allocator_type& alloc = allocator_type()):
 	m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)
 	{
 		this->assign(first, last);
@@ -516,61 +523,66 @@ public:
 *															NON MEMBERS FUNCTIONS OVERLOADS														
 ***********************************************************************************************************************************/
 
-	/*template <class T, class Alloc>
+	template <class T, class Alloc>
 	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-
+		if(lhs.size() != rhs.size())
+			return false;
+		for (size_t i = 0; i < lhs.size(); i++)
+		{
+			if (lhs[i] != rhs[i])
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	template <class T, class Alloc>
 	bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-
+		return (!(lhs == rhs));
 	}
 
 	template <class T, class Alloc>
 	bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-
+		size_t i = 0;
+		for ( ;i < lhs.size(); i++)
+		{
+			if (i + 1 == rhs.size() || rhs[i] < lhs[i])
+				return false;
+			if (lhs[i] < rhs[i])
+				return true;
+		}
+		return (rhs[i] != lhs[i]);
 	}
 
 
 	template <class T, class Alloc>
 	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-
+		return (!(rhs < lhs));
 	}
 
 
 	template <class T, class Alloc>
 	bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-
+		return ((rhs < lhs));
 	}
 
 
 	template <class T, class Alloc>
 	bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
+		return (!(lhs < rhs));
 
 	}
 	template <class T, class Alloc>
 	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
 	{
-
-	}*/
-
-template<typename T>
-std::ostream	&	operator<<(std::ostream & o, vector<T> & rhs)
-{
-	o << std::endl << "[vector]\n\tcapacity:\t" << rhs.capacity() << "\n\tsize:\t\t" << rhs.size() << std::endl;
-	o << "[values]" << std::endl;
-	for (size_t i = 0; i < rhs.size(); i++)
-	{
-		o << "\tvector[" << i << "] = " << rhs.getValue(i) << std::endl;
+		x.swap(y);
 	}
-	return o;
-}
-
 }
 #endif

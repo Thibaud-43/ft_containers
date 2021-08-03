@@ -2,7 +2,7 @@
 # define REVERSEITERATOR_HPP
 
 #include <string>
-#include "vector.hpp"
+#include <vector.hpp>
 #include <iostream>
 #include <memory>
 
@@ -16,10 +16,12 @@ class ReverseIterator : public Iterator
 
 public:
 	typedef	typename Iterator::value_type				value_type;
-	typedef	typename Iterator::pointer_type				pointer_type;
-	typedef	typename Iterator::reference_type			reference_type;
+	typedef	typename Iterator::pointer					pointer;
+	typedef	typename Iterator::reference				reference;
 	typedef typename Iterator::const_pointer 			const_pointer;
 	typedef typename Iterator::const_reference			const_reference;
+	typedef typename Iterator::iterator_category		iterator_category;
+
 
 	ReverseIterator(void): Iterator()
 	{
@@ -34,7 +36,7 @@ public:
 	~ReverseIterator()
 	{
 	}
-	reference_type	operator*()
+	reference	operator*()
 	{
         Iterator    tmp(*this);
 		return (*--tmp);
@@ -44,7 +46,7 @@ public:
         Iterator    tmp(*this);
 		return (*--tmp);
 	}
-	pointer_type	operator->()
+	pointer	operator->()
 	{
         Iterator    tmp(*this);
 		return (&*--tmp);
