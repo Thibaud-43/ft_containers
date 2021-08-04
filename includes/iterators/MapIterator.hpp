@@ -34,7 +34,7 @@ public:
 	{
 	}
 
-	MapIterator & operator= (MapIterator const & rhs) 
+	/*MapIterator & operator= (MapIterator const & rhs) 
 	{
 
 	}
@@ -120,7 +120,7 @@ public:
 	bool operator>=(MapIterator const &other) const 
     {
 
-	}
+	}*/
 	protected:
 		pointer		m_ptr;
 };

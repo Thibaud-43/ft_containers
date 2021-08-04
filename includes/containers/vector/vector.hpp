@@ -1,14 +1,13 @@
-#ifndef Vector_H
- #define Vector_H
+#ifndef Vector_HPP
+ #define Vector_HPP
 
+#include <VectorIterator.hpp>
 #include <ReverseIterator.hpp>
 #include <IteratorTraits.hpp>
-#include <VectorIterator.hpp>
 #include <string>
 #include <limits>
 #include <iostream>
 #include <memory>
-
 
 
 namespace ft

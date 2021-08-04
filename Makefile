@@ -1,5 +1,5 @@
 SRCS_VECTOR		=	vector.cpp		
-SRCS_MAP		=	map.cpp			\
+SRCS_MAP		=	map.cpp		
 
 
 

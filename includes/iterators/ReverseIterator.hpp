@@ -1,16 +1,13 @@
 #ifndef REVERSEITERATOR_HPP
 # define REVERSEITERATOR_HPP
 
-#include <string>
-#include <vector.hpp>
-#include <map.hpp>
-#include <iostream>
-#include <memory>
 
 class vectorIterator;
+class mapIterator;
 
 namespace ft
 {
+
 template<typename Iterator>
 class ReverseIterator : public Iterator
 {

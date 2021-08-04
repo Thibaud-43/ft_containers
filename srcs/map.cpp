@@ -55,6 +55,12 @@ int main(void)
 	std::cout << "TEST CONSTRUCTORS" << std::endl << std::endl;
 	{
 		clock.setBeginStd();
+		std::map<int, std::string>	test = {
+			{11, "onze"},
+			{22, "douze"},
+			{1, "un"}
+		};
+		std::cout << std::endl;
 		clock.printStdTime();
 	}
 	{

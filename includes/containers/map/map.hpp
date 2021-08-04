@@ -10,9 +10,16 @@
 #include <iostream>
 #include <memory>
 
-
 namespace ft
 {
+
+template <class Arg1, class Arg2, class Result>
+struct binary_function 
+{
+    typedef Arg1 first_argument_type;
+    typedef Arg2 second_argument_type;
+    typedef Result result_type;
+};
 
 template <class T> 
 struct less : binary_function <T,T,bool> 
@@ -23,10 +30,19 @@ struct less : binary_function <T,T,bool>
 	}
 };
 
+template <class Key, class T>
+struct BNode
+{
+	pair<Key, T> 	pair;
+	BNode 			*left;
+	BNode 			*right;
+	BNode 			*parent;
+	bool 			end;
+};
 
-template < class Key,                                     // map::key_type
-           class T,                                       // map::mapped_type
-           class Compare = ft::less<Key>,                     // map::key_compare
+template < class Key,                                     		// map::key_type
+           class T,                                       		// map::mapped_type
+           class Compare = ft::less<Key>,                     	// map::key_compare
            class Alloc = std::allocator<pair<const Key,T> >    // map::allocator_type
            >
 class map
@@ -42,7 +58,24 @@ public:
 	typedef T									mapped_type;
 	typedef pair<const Key, T> 					value_type;
 	typedef	Compare								key_compare;
-	//typedef										value_compare;
+	class 	value_compare
+	{   
+		friend class map;
+		protected:
+			Compare comp;
+			value_compare (Compare c) : comp(c) 
+			{
+
+			}
+		public:
+			typedef bool result_type;
+			typedef value_type first_argument_type;
+			typedef value_type second_argument_type;
+			bool operator() (const value_type& x, const value_type& y) const
+			{
+				return comp(x.first, y.first);
+			}
+	};
 	typedef Alloc								allocator_type;
 	typedef	value_type	&						reference;
 	typedef	value_type const &					const_reference;
@@ -54,6 +87,7 @@ public:
 	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
 	typedef std::ptrdiff_t 						difference_type;
 	typedef	size_t								size_type;
+	typedef	BNode<key_type, mapped_type>*		node_type;
 
 
 
@@ -61,13 +95,13 @@ public:
 *															CONSTRUCTORS / DESTRUCTORS														
 ***********************************************************************************************************************************/
 
-	explicit map (const key_compare& comp = key_compare(),
-				const allocator_type& alloc = allocator_type())
+	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+	:m_root(nullptr), m_size(0), m_alloc(alloc), m_comp(comp)
 	{
 
 	}
 
-	template <class InputIterator>
+	/*template <class InputIterator>
 	map (InputIterator first, InputIterator last,
 		const key_compare& comp = key_compare(),
 		const allocator_type& alloc = allocator_type())
@@ -78,7 +112,7 @@ public:
 	map (const map& x)
 	{
 
-	}
+	}*/
 
 	~map()
 	{
@@ -138,7 +172,11 @@ public:
 /***********************************************************************************************************************************
 *															ELEMENT ACCESS																
 ***********************************************************************************************************************************/
-	mapped_type& operator[] (const key_type& k);
+	
+	/*mapped_type& operator[] (const key_type& k)
+	{
+
+	}*/
 	
 
 
@@ -147,7 +185,7 @@ public:
 ***********************************************************************************************************************************/
 
 
-	pair<iterator,bool> insert (const value_type& val)
+	/*pair<iterator,bool> insert (const value_type& val)
 	{
 
 	}
@@ -190,7 +228,7 @@ public:
 	void swap (map& x)
 	{
 
-	}
+	}*/
 	void clear()
 	{
 
@@ -212,7 +250,7 @@ public:
 /***********************************************************************************************************************************
 *															OPERATIONS														
 ***********************************************************************************************************************************/
-	iterator find (const key_type& k)
+	/*iterator find (const key_type& k)
 	{
 
 	}
@@ -247,7 +285,7 @@ public:
 	pair<iterator,iterator>             equal_range (const key_type& k)
 	{
 
-	}
+	}*/
 /***********************************************************************************************************************************
 *															ALLOCATOR																
 ***********************************************************************************************************************************/
@@ -263,9 +301,17 @@ allocator_type get_allocator() const
 	
 	private :
 		size_type		m_size;
-		size_type		m_capacity;
 		allocator_type	m_alloc;
-		
+		node_type		m_root;
+		key_compare		m_comp;
+
+/***********************************************************************************************************************************
+*															EXTRA : BINARY TREE FUNCTON																
+***********************************************************************************************************************************/
+		init();
+		free();
+		insert();
+		delete();
 
 };
 
