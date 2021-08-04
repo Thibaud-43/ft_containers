@@ -3,6 +3,7 @@
 
 #include <ReverseIterator.hpp>
 #include <IteratorTraits.hpp>
+#include <VectorIterator.hpp>
 #include <string>
 #include <limits>
 #include <iostream>
@@ -12,156 +13,6 @@
 
 namespace ft
 {
-
-template<typename T>
-class vectorIterator
-{
-
-public:
-	typedef	T												value_type;
-	typedef	value_type*										pointer;
-	typedef	value_type&										reference;
-	typedef value_type const * 								const_pointer;
-	typedef value_type const & 								const_reference;
-	typedef ptrdiff_t										difference_type;
-	typedef std::forward_iterator_tag						iterator_category;
-
-	vectorIterator(void): m_ptr(nullptr)
-	{
-	}
-	vectorIterator(pointer ptr): m_ptr(ptr)
-	{
-	}
-	vectorIterator(vectorIterator const & src): m_ptr(src.m_ptr)
-	{
-	}
-	virtual ~vectorIterator()
-	{
-	}
-
-	vectorIterator & operator= (vectorIterator const & rhs) 
-	{
-		m_ptr = rhs.m_ptr;
-		return *this;
-	}
-	vectorIterator & operator++ (void) 
-	{
-		++this->m_ptr;
-		return *this;
-	}
-	vectorIterator 	operator++ (int) 
-	{
-		vectorIterator	tmp(*this);
-		++this->m_ptr;
-		return tmp;
-	}
-	vectorIterator & operator-- (void) 
-	{
-		m_ptr--;
-		return *this;
-	}
-	vectorIterator	operator--(int) 
-	{
-
-		vectorIterator	tmp(*this);
-		m_ptr--;
-		return tmp;
-	}
-	reference	operator[](int index)
-	{
-		return *(m_ptr + index);
-	}
-	pointer	operator->()
-	{
-		return m_ptr;
-	}
-	reference	operator*()
-	{
-		return (*this->m_ptr);
-	}
-	bool			operator== (const vectorIterator ptr) const
-	{
-		if (m_ptr == ptr.m_ptr)
-			return true;
-		return false;
-	}
-	bool			operator!= (const vectorIterator ptr) const
-	{
-		if (m_ptr == ptr.m_ptr)
-			return false;
-		return true;
-	}
-	vectorIterator &operator+=(int n)
-	{
-		while (n < 0)
-		{
-			(*this)--;
-			n++;
-		}
-		while (n > 0)
-		{
-			(*this)++;
-			n--;
-		}
-		return (*this);
-	};
-	vectorIterator &operator-=(int n)
-	{
-
-		while (n > 0)
-		{
-			operator--();	
-			n--;
-		}
-		while (n < 0)
-		{
-			operator++();
-			n++;
-		}
-		return (*this);
-	};
-	vectorIterator operator+(int n) const
-	{
-		vectorIterator tmp(*this);
-		tmp += n;
-		return (tmp);
-	};
-	vectorIterator operator-(int n) const
-	{
-		vectorIterator tmp(*this);
-
-		tmp -= n;
-		return (tmp);
-	};
-	std::ptrdiff_t	operator-(vectorIterator & rhs) const
-	{
-		return m_ptr - rhs.m_ptr;
-	}
-	const_reference operator[](int nb) const 
-	{
-		return (*(this->m_ptr + nb));
-	}
-	const_reference operator*() const {
-		return (*this->m_ptr);
-	}
-	const_pointer operator->() const {
-		return (this->m_ptr);
-	}
-	bool operator<(vectorIterator const &other) const {
-		return (this->m_ptr < other.m_ptr);
-	}
-	bool operator<=(vectorIterator const &other) const {
-		return (this->m_ptr <= other.m_ptr);
-	}
-	bool operator>(vectorIterator const &other) const {
-		return (this->m_ptr > other.m_ptr);
-	}
-	bool operator>=(vectorIterator const &other) const {
-		return (this->m_ptr >= other.m_ptr);
-	}
-	protected:
-		pointer		m_ptr;
-};
 
 
 template<typename T, class Alloc = std::allocator<T> >
@@ -179,8 +30,8 @@ public:
 	typedef	value_type const &					const_reference;
 	typedef	value_type	*						pointer;
 	typedef	value_type const *					const_pointer;
-	typedef vectorIterator<value_type>			iterator;
-	typedef vectorIterator<value_type> 			const_iterator;
+	typedef VectorIterator<value_type>			iterator;
+	typedef VectorIterator<value_type> 			const_iterator;
 	typedef ReverseIterator<iterator> 			reverse_iterator;
 	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
 	typedef std::ptrdiff_t 						difference_type;
@@ -201,8 +52,7 @@ public:
 	{
 		this->assign(n, val);
 	}
-	/*template <class InputIterator>
-    vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()):*/
+
 	template <class InputIterator>
     vector (InputIterator first, 
 	typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last, 
@@ -373,7 +223,7 @@ public:
 ***********************************************************************************************************************************/
 	
 	template <class InputIterator>
-	void assign (InputIterator first, InputIterator last)
+	void assign (InputIterator first, typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last)
 	{
 		m_alloc.deallocate(m_data, m_capacity);
 		m_capacity = last - first;
@@ -450,7 +300,7 @@ public:
 	}
 
 	template <class InputIterator>
-	void insert (iterator position, InputIterator first, InputIterator last)
+	void insert (iterator position, InputIterator first, typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last)
 	{
 		while (first != last)
 		{
@@ -511,7 +361,7 @@ public:
 ***********************************************************************************************************************************/
 	
 	private :
-		T				*m_data;
+		value_type		*m_data;
 		size_type		m_size;
 		size_type		m_capacity;
 		allocator_type	m_alloc;

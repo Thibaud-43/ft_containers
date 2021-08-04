@@ -1,34 +1,41 @@
-SRCS		=	mainVector.cpp		\
+SRCS_VECTOR		=	vector.cpp		
+SRCS_MAP		=	map.cpp			\
 
 
-NAME	= vector
+
+VECTOR	= vector
+MAP		= map
 
 CXX		= clang++
 CXXFLAGS = -Wall -Wextra -Werror 
 
 RM		= rm -rf
 
-SRCS_PATH	=	./
-OBJS_PATH	=	.objs/
-INC			= -I includes/
+SRCS_PATH			=	./srcs/
+OBJS_PATH			=	.objs/
+INC					= -I includes/containers/vector -I includes/containers/map -I includes/iterators
 
 
-OBJS		= $(addprefix $(OBJS_PATH),$(SRCS:.cpp=.o))
+OBJS_VECTOR		= $(addprefix $(OBJS_PATH),$(SRCS_VECTOR:.cpp=.o))
+OBJS_MAP		= $(addprefix $(OBJS_PATH),$(SRCS_MAP:.cpp=.o))
 
-$(OBJS_PATH)%.o: %.cpp
+$(OBJS_PATH)%.o: $(SRCS_PATH)%.cpp
 	@ mkdir -p $(OBJS_PATH)
 	$(CXX) $(INC) $(CXXFLAGS) -c $< -o $@
 
-all: $(NAME)
+all: $(VECTOR) $(MAP)
 
-$(NAME): $(OBJS)
-	$(CXX) $(OBJS) $(INC) -o $(NAME)
+$(VECTOR): $(OBJS_VECTOR)
+	$(CXX) $(OBJS_VECTOR) $(INC) -o $(VECTOR)
+
+$(MAP): $(OBJS_MAP)
+	$(CXX) $(OBJS_MAP) $(INC) -o $(MAP)
 
 clean: 
-	$(RM) $(OBJS) $(OBJS_PATH)
+	$(RM) $(OBJS_VECTOR) $(OBJS_MAP) $(OBJS_PATH)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(VECTOR) $(MAP)
 
 re: clean all
 
