@@ -1,5 +1,6 @@
 #ifndef PAIR_HPP
 # define PAIR_HPP
+#include <string>
 
 namespace ft
 {
@@ -9,11 +10,10 @@ namespace ft
     public:
         typedef	T1	first_type;
         typedef	T2	second_type;
-    protected:
         first_type	first;
         second_type	second;
     public:
-        pair():first(second), second(0)
+        pair():first(T1()), second(T2())
         {
 
         }
@@ -28,7 +28,11 @@ namespace ft
         {
 
         }
-        pair& operator= (const pair& pr)
+        ~pair()
+		{
+		}
+
+        pair & operator= (const pair& pr)
         {
             first = pr.first;
             second = pr.second;
@@ -79,8 +83,8 @@ namespace ft
         return (!(lhs < rhs));
     }
 
-    template <class T1,class T2>
-    pair<T1,T2> make_pair (T1 x, T2 y)
+    template <class T1, class T2>
+    pair<T1,T2> make_pair(T1 x, T2 y)
     {
         return ( pair<T1,T2>(x,y));
     }

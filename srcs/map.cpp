@@ -50,22 +50,32 @@ int main(void)
 {
 	Time	clock;
 
-
-
 	std::cout << "TEST CONSTRUCTORS" << std::endl << std::endl;
 	{
 		clock.setBeginStd();
-		std::map<int, std::string>	test = {
-			{11, "onze"},
-			{22, "douze"},
-			{1, "un"}
-		};
-		std::cout << std::endl;
+		std::map<std::string, int>	test2;
+		std::map<int, int>	test;
+		test.insert(std::make_pair(10, 10));
+		test2.insert(std::make_pair("test", 10));
+		test2.insert(std::make_pair("test1", 10));
+		test2.insert(std::make_pair("test4", 10));
+		test2.insert(std::make_pair("test5", 10));
+		std::map<std::string, int>::iterator it = test2.begin();
+		std::cout << it->first << std::endl;
 		clock.printStdTime();
 	}
 	{
 		clock.setBeginFt();
 		using namespace ft;
+		map<std::string, int>	test2;
+		map<int, int>	test;
+		test.insert(make_pair(10, 10));
+		test2.insert(make_pair("test", 10));
+		test2.insert(make_pair("test1", 10));
+		test2.insert(make_pair("test4", 10));
+		test2.insert(make_pair("test5", 10));
+		map<std::string, int>::iterator it = test2.begin();
+		std::cout << it->first << std::endl;
 		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;

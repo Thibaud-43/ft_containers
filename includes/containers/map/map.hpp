@@ -4,8 +4,8 @@
 #include <ReverseIterator.hpp>
 #include <IteratorTraits.hpp>
 #include <MapIterator.hpp>
-#include <pair.hpp>
 #include <string>
+#include <pair.hpp>
 #include <limits>
 #include <iostream>
 #include <memory>
@@ -30,14 +30,14 @@ struct less : binary_function <T,T,bool>
 	}
 };
 
-template <class Key, class T>
+template <class  Key, class T>
 struct BNode
 {
-	pair<Key, T> 	pair;
-	BNode 			*left;
-	BNode 			*right;
-	BNode 			*parent;
-	bool 			end;
+	pair<Key, T> 		pair;
+	BNode 				*left;
+	BNode 				*right;
+	BNode 				*parent;
+	bool 				end;
 };
 
 template < class Key,                                     		// map::key_type
@@ -81,8 +81,8 @@ public:
 	typedef	value_type const &					const_reference;
 	typedef	value_type	*						pointer;
 	typedef	value_type const *					const_pointer;
-	typedef MapIterator<value_type>				iterator;
-	typedef MapIterator<value_type> 			const_iterator;
+	typedef MapIterator<key_type, mapped_type>	iterator;
+	typedef MapIterator<key_type, mapped_type> 	const_iterator;
 	typedef ReverseIterator<iterator> 			reverse_iterator;
 	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
 	typedef std::ptrdiff_t 						difference_type;
@@ -98,6 +98,8 @@ public:
 	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 	:m_root(nullptr), m_size(0), m_alloc(alloc), m_comp(comp)
 	{
+		init();
+
 
 	}
 
@@ -116,7 +118,8 @@ public:
 
 	~map()
 	{
-
+		print_tree(m_root);
+		free_tree(m_root);
 	}
 
 /***********************************************************************************************************************************
@@ -125,13 +128,27 @@ public:
 
 	iterator begin()
 	{
-
+		node_type n = m_root;
+		/*if (!n->left && !n->right)
+			return (end());*/
+		if (!n->left && n->right)
+			n = n->right;
+		while (n->left)
+			n = n->left;
+		return (iterator(n));
 	}
-	const_iterator begin() const
+	/*const_iterator begin() const
 	{
-
-	}
-	iterator end()
+		node_type n = m_root;
+		if (!n->left && !n->right)
+			return (end());
+		if (!n->left && n->right)
+			n = n->right;
+		while (n->left)
+			n = n->left;
+		return (const_iterator(&(n->pair));
+	}*/
+	/*iterator end()
 	{
 
 	}
@@ -154,7 +171,7 @@ public:
 	const_reverse_iterator rend() const
 	{
 
-	}
+	}*/
 
 /***********************************************************************************************************************************
 *															CAPACITY																
@@ -184,14 +201,18 @@ public:
 *															MODIFIERS																
 ***********************************************************************************************************************************/
 
+	void	insert(const value_type & val)
+	{
+		add_node(val, m_root);
+	}
 
 	/*pair<iterator,bool> insert (const value_type& val)
 	{
+		add_node(val, m_root);
+	}*/
 
-	}
 
-
-
+/*
 	iterator insert (iterator position, const value_type& val)
 	{
 
@@ -300,18 +321,72 @@ allocator_type get_allocator() const
 ***********************************************************************************************************************************/
 	
 	private :
+		node_type		m_root;
 		size_type		m_size;
 		allocator_type	m_alloc;
-		node_type		m_root;
 		key_compare		m_comp;
 
 /***********************************************************************************************************************************
 *															EXTRA : BINARY TREE FUNCTON																
-***********************************************************************************************************************************/
-		init();
-		free();
-		insert();
-		delete();
+***********************************************************************************************************************************/	
+		void print_tree(node_type n)
+		{
+			if (!n)
+				return;
+			print_tree(n->left);
+			std::cout << n->pair.first << "=" << n->pair.second << std::endl;
+			print_tree(n->right);
+		};
+
+		void	init(void)
+		{
+			m_root = create_node(value_type(key_type(), mapped_type()), nullptr, true);
+			//m_root = create_node(make_pair(key_type(), mapped_type()), nullptr, true);
+		}
+
+		node_type	create_node(value_type	pair, node_type parent, bool end)
+		{
+
+			node_type	elem = new	BNode<key_type, mapped_type>();
+
+			elem->pair = pair;
+			elem->parent = parent;
+			elem->right = nullptr;
+			elem->left = nullptr;
+			elem->end = end;
+			return elem;
+		}
+		
+		void		add_node(pair<key_type, mapped_type> pair, node_type current)
+		{
+			if (current->end)
+			{
+				if (pair > current->pair)
+				{
+					current->end = false;
+					current->right = create_node(pair, current, true);
+				}
+				else
+				{
+					current->end = false;
+					current->left = create_node(pair, current, true);
+				}
+			}
+			else if (pair > current->pair)
+				add_node(pair, current->right);
+			else
+				add_node(pair, current->left);
+			return ;
+		}
+
+		void	free_tree(node_type current)
+		{
+			if (current->left)
+				free_tree(current->left);
+			if (current->right)
+				free_tree(current->right);
+			delete current;
+		}
 
 };
 
