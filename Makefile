@@ -7,7 +7,7 @@ VECTOR	= vector
 MAP		= map
 
 CXX		= clang++
-CXXFLAGS = -Wall -Wextra -Werror 
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 RM		= rm -rf
 

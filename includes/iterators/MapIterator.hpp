@@ -24,7 +24,7 @@ public:
 	typedef	value_type&										reference;
 	typedef value_type const * 								const_pointer;
 	typedef value_type const & 								const_reference;
-	typedef ptrdiff_t										difference_type;
+	typedef std::ptrdiff_t									difference_type;
 	typedef std::forward_iterator_tag						iterator_category;
 
 private:
@@ -40,7 +40,7 @@ private:
 		else
 		{
 			tmp = m_ptr;
-			while (tmp->parent && !tmp->parent->left)
+			while (tmp->parent && !tmp->parent->root && tmp == tmp->parent->right)
 				tmp = tmp->parent;
 			tmp = tmp->parent;
 		}
@@ -48,11 +48,25 @@ private:
 	}
 	void	m_decrement(void)
 	{
-		
+		pointer	tmp;
+		if (m_ptr->left)
+		{
+			tmp = m_ptr->left;
+			while (tmp->right)
+				tmp = tmp->right;
+		}
+		else
+		{
+			tmp = m_ptr;
+			while (tmp->parent && !tmp->parent->root && tmp == tmp->parent->left)
+				tmp = tmp->parent;
+			tmp = tmp->parent;
+		}
+		m_ptr = tmp;
 	}
 public:
 
-	MapIterator(void): m_ptr(nullptr)
+	MapIterator(void): m_ptr(NULL)
 	{
 
 	}
@@ -76,21 +90,27 @@ public:
 	}
 	MapIterator & operator++ (void) 
 	{
-
+		MapIterator	tmp(this);
+		operator++();
+		return(tmp);
 	}
 	MapIterator 	operator++ (int) 
 	{
-
+		m_increment();
+		return(*this);
 	}
-	/*MapIterator & operator-- (void) 
+	MapIterator & operator-- (void) 
 	{
-
+		MapIterator	tmp(this);
+		operator--();
+		return(tmp);
 	}
 	MapIterator	operator--(int) 
 	{
-
+		m_decrement();
+		return(*this);
 	}
-	reference	operator[](int index)
+	/*reference	operator[](int index)
 	{
 	}
 	pointer	operator->()
@@ -100,16 +120,16 @@ public:
 	reference	operator*()
 	{
 
-	}
+	}*/
 	bool			operator== (const MapIterator ptr) const
 	{
-
+		return(m_ptr == ptr.m_ptr);
 	}
 	bool			operator!= (const MapIterator ptr) const
 	{
-
+		return (!(*this == ptr));
 	}
-	MapIterator &operator+=(int n)
+	/*MapIterator &operator+=(int n)
 	{
 
 	};

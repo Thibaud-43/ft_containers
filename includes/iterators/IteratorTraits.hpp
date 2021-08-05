@@ -40,13 +40,13 @@ namespace ft
 			typedef	value_type&										reference;
 			typedef value_type const * 								const_pointer;
 			typedef value_type const & 								const_reference;
-			typedef ptrdiff_t										difference_type;
+			typedef std::ptrdiff_t									difference_type;
 			typedef std::forward_iterator_tag						iterator_category;
 	};
 	template<> class iterator_traits<bool>{};
 	template<> class iterator_traits<char>{};
-	template<> class iterator_traits<char16_t>{};
-	template<> class iterator_traits<char32_t>{};
+	//template<> class iterator_traits<std::char16_t>{};
+	//template<> class iterator_traits<std::char32_t>{};
 	template<> class iterator_traits<wchar_t>{};
 	template<> class iterator_traits<signed char>{};
 	template<> class iterator_traits<short int>{};
@@ -66,11 +66,11 @@ namespace ft
 		typedef char no[2]; 
 
 		template <typename IsIterator_>
-		static yes& test(typename iterator_traits<IsIterator_>::iterator_category* = nullptr);
+		static yes& test(typename iterator_traits<IsIterator_>::iterator_category* = NULL);
 
 		template <typename C>
 		static no& test(...);
-		static const bool value = sizeof(test<IsIterator>(nullptr)) == sizeof(yes);
+		static const bool value = sizeof(test<IsIterator>(NULL)) == sizeof(yes);
 	};
 }
 #endif

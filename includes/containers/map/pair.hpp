@@ -8,34 +8,35 @@ namespace ft
     struct pair
     {
     public:
-        typedef	T1	first_type;
-        typedef	T2	second_type;
-        first_type	first;
-        second_type	second;
+        typedef T1	        first_type;
+        typedef	T2	        second_type;
+        first_type	        first;
+        second_type	        second;
     public:
         pair():first(T1()), second(T2())
         {
 
         }
 
-        template<class U, class V> 
-        pair (const pair<U,V>& pr):first(pr.first), second(pr.second)
-        {
 
-        }
 
         pair (const first_type& a, const second_type& b):first(a), second(b)
         {
 
         }
-        ~pair()
+        template<class U, class V> 
+        pair (const pair<U,V>& pr):first(pr.first), second(pr.second)
+        {
+
+        }
+        /*~pair()
 		{
-		}
+		}*/
 
         pair & operator= (const pair& pr)
         {
-            first = pr.first;
-            second = pr.second;
+            this->first = pr.first;
+            this->second = pr.second;
             return(*this);
         }
     };

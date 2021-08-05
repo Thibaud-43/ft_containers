@@ -42,12 +42,12 @@ public:
 *															CONSTRUCTORS / DESTRUCTORS														
 ***********************************************************************************************************************************/
 
-	explicit vector (const allocator_type& alloc = allocator_type()): m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)   
+	explicit vector (const allocator_type& alloc = allocator_type()): m_data(NULL), m_size(0), m_capacity(0), m_alloc(alloc)   
 	{
 	}
 
 	explicit vector (int n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): 
-	m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)
+	m_data(NULL), m_size(0), m_capacity(0), m_alloc(alloc)
 	{
 		this->assign(n, val);
 	}
@@ -56,12 +56,12 @@ public:
     vector (InputIterator first, 
 	typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last, 
 	const allocator_type& alloc = allocator_type()):
-	m_data(nullptr), m_size(0), m_capacity(0), m_alloc(alloc)
+	m_data(NULL), m_size(0), m_capacity(0), m_alloc(alloc)
 	{
 		this->assign(first, last);
 	}
 
-	vector (const vector & x): m_data(nullptr), m_size(0), m_capacity(0), m_alloc(x.m_alloc)
+	vector (const vector & x): m_data(NULL), m_size(0), m_capacity(0), m_alloc(x.m_alloc)
 	{
 		this->assign(x.begin(), x.end());
 	}

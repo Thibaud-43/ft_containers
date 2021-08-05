@@ -1,6 +1,6 @@
-1)Fonction construction arbre binaire
-2)Iterateurs
+1)Iterateurs
+2)insert (ft_tree_insert_pos)
 3) autres fonctions
 2) is_integral, equal/lexicographical com-
-pare, std::pair,
+pare,
 3) tests

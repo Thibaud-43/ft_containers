@@ -37,7 +37,9 @@ struct BNode
 	BNode 				*left;
 	BNode 				*right;
 	BNode 				*parent;
+	bool 				end_branch;
 	bool 				end;
+	bool				root;
 };
 
 template < class Key,                                     		// map::key_type
@@ -96,7 +98,7 @@ public:
 ***********************************************************************************************************************************/
 
 	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-	:m_root(nullptr), m_size(0), m_alloc(alloc), m_comp(comp)
+	:m_root(NULL), m_size(0), m_alloc(alloc), m_comp(comp)
 	{
 		init();
 
@@ -118,7 +120,6 @@ public:
 
 	~map()
 	{
-		print_tree(m_root);
 		free_tree(m_root);
 	}
 
@@ -129,34 +130,44 @@ public:
 	iterator begin()
 	{
 		node_type n = m_root;
-		/*if (!n->left && !n->right)
-			return (end());*/
+		if (!n->left && !n->right)
+			return (iterator(n));
 		if (!n->left && n->right)
 			n = n->right;
 		while (n->left)
 			n = n->left;
 		return (iterator(n));
 	}
-	/*const_iterator begin() const
+	const_iterator begin() const
 	{
 		node_type n = m_root;
 		if (!n->left && !n->right)
-			return (end());
+			return (const_iterator(n));
 		if (!n->left && n->right)
 			n = n->right;
 		while (n->left)
 			n = n->left;
-		return (const_iterator(&(n->pair));
-	}*/
-	/*iterator end()
+		return (const_iterator(n));
+	}
+	iterator end()
 	{
-
+		node_type n = m_root;
+		if (!n->left && !n->right)
+			return (iterator(n));
+		while (!n->end)
+			n = n->right;
+		return (iterator(n));
 	}
 	const_iterator end() const
 	{
-
+		node_type n = m_root;
+		if (!n->left && !n->right)
+			return (const_iterator(n));
+		while (!n->end)
+			n = n->right;
+		return (const_iterator(n));
 	}
-	reverse_iterator rbegin()
+	/*reverse_iterator rbegin()
 	{
 
 	}
@@ -201,15 +212,17 @@ public:
 *															MODIFIERS																
 ***********************************************************************************************************************************/
 
-	void	insert(const value_type & val)
+	pair<iterator,bool> insert (const value_type& val)
 	{
-		add_node(val, m_root);
+		node_type	tmp = find(val.first, m_root);
+		if (tmp)
+			return(pair<iterator, bool>(iterator(tmp), false));
+		else
+		{
+			m_size++;
+			return (pair<iterator, bool>(iterator(add_node(val, m_root)), true));
+		}
 	}
-
-	/*pair<iterator,bool> insert (const value_type& val)
-	{
-		add_node(val, m_root);
-	}*/
 
 
 /*
@@ -340,43 +353,78 @@ allocator_type get_allocator() const
 
 		void	init(void)
 		{
-			m_root = create_node(value_type(key_type(), mapped_type()), nullptr, true);
-			//m_root = create_node(make_pair(key_type(), mapped_type()), nullptr, true);
+			m_root = create_node(value_type(key_type(), mapped_type()), NULL, true, true, false);
+			m_root->right = create_node(value_type(key_type(), mapped_type()), NULL, true, false, true);
 		}
 
-		node_type	create_node(value_type	pair, node_type parent, bool end)
+		node_type	create_node(value_type	pair, node_type parent, bool end_branch, bool root = false, bool end = false, node_type node_end = NULL)
 		{
 
 			node_type	elem = new	BNode<key_type, mapped_type>();
 
 			elem->pair = pair;
 			elem->parent = parent;
-			elem->right = nullptr;
-			elem->left = nullptr;
+			elem->right = node_end;
+			elem->left = NULL;
+			elem->end_branch = end_branch;
+			elem->root = root;
 			elem->end = end;
 			return elem;
 		}
-		
-		void		add_node(pair<key_type, mapped_type> pair, node_type current)
+		node_type		find(key_type key, node_type current)
 		{
-			if (current->end)
+			node_type	ret1 = NULL;
+			node_type	ret2 = NULL;
+			if (current->left)
+				ret1 = find(key, current->left);
+			if (current->right)
+				ret2 = find(key, current->right);
+			if (current->pair.first == key)
+			{
+				return current;
+			}
+			else
+			{
+				if (ret1)
+					return ret1;
+				else if (ret2)
+					return ret2;
+				else
+					return NULL;
+			}
+			
+		}
+		node_type		add_node(pair<key_type, mapped_type> pair, node_type current)
+		{
+			if (current->end_branch)
 			{
 				if (pair > current->pair)
 				{
-					current->end = false;
-					current->right = create_node(pair, current, true);
+					if (current->right && current->right->end)
+					{
+						current->end_branch = false;
+						current->right = create_node(pair, current, true, false, false, current->right);
+						current->right->right->parent = current->right;
+						return(current->right);
+					}
+					else
+					{
+						current->end_branch = false;
+						current->right = create_node(pair, current, true);
+						return(current->right);
+					}
 				}
 				else
 				{
-					current->end = false;
+					current->end_branch = false;
 					current->left = create_node(pair, current, true);
+					return(current->left);
 				}
 			}
 			else if (pair > current->pair)
-				add_node(pair, current->right);
+				 return(add_node(pair, current->right));
 			else
-				add_node(pair, current->left);
-			return ;
+				return(add_node(pair, current->left));
 		}
 
 		void	free_tree(node_type current)

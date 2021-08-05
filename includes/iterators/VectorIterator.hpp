@@ -18,10 +18,10 @@ public:
 	typedef	value_type&										reference;
 	typedef value_type const * 								const_pointer;
 	typedef value_type const & 								const_reference;
-	typedef ptrdiff_t										difference_type;
+	typedef std::ptrdiff_t									difference_type;
 	typedef std::forward_iterator_tag						iterator_category;
 
-	VectorIterator(void): m_ptr(nullptr)
+	VectorIterator(void): m_ptr(NULL)
 	{
 	}
 	VectorIterator(pointer ptr): m_ptr(ptr)
