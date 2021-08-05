@@ -135,6 +135,44 @@ int main(void)
 		}
 		clock.printFtTime();
 	}
+
+	std::cout << "TEST" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		std::map<char,int> mymap;
+
+		// first insert function version (single parameter):
+		mymap.insert ( std::pair<char,int>('a',100) );
+		mymap.insert ( std::pair<char,int>('z',200) );
+		std::map<char, int>::reverse_iterator it = mymap.rbegin();
+		std::map<char, int>::reverse_iterator it2 = mymap.rend();
+		
+		for (; it != it2; it++)
+		{
+			std::cout << it->first << std::endl;
+		}
+		
+		clock.printStdTime();
+	}
+	{
+		clock.setBeginFt();
+		using namespace ft;
+		map<char,int> mymap;
+
+		// first insert function version (single parameter):
+		mymap.insert ( pair<char,int>('a',100) );
+		mymap.insert ( pair<char,int>('z',200) );
+		map<char, int>::reverse_iterator it = mymap.rbegin();
+		map<char, int>::reverse_iterator it2 = mymap.rend();
+
+		for (; it != it2; it++)
+		{
+			std::cout << it->first << std::endl;
+		}
+
+		clock.printStdTime();
+		clock.printFtTime();
+	}
 	std::cout << std::endl << std::endl;
 	return 0;
 }

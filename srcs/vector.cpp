@@ -1049,6 +1049,22 @@ int main(void)
 
 		clock.printFtTime();
 	}
+
+
+	{
+		clock.setBeginFt();
+		using namespace ft;
+		vector<int> foo (3,100);   // three ints with a value of 100
+		vector<int> bar (5,200);   // five ints with a value of 200
+		
+		const vector<int>::iterator	it = 0;
+		std::cout << *it << std::endl;
+		std::cout << '\n';
+
+		clock.printFtTime();
+	}
+
+
 	std::cout << std::endl << std::endl;
 	return 0;
 }

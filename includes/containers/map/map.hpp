@@ -167,22 +167,24 @@ public:
 			n = n->right;
 		return (const_iterator(n));
 	}
-	/*reverse_iterator rbegin()
+	reverse_iterator rbegin()
 	{
-
+		iterator	n = end();
+		return (reverse_iterator(n));
 	}
 	const_reverse_iterator rbegin() const
 	{
-
+		iterator	n = end();
+		return (const_reverse_iterator(n));
 	}
 	reverse_iterator rend()
 	{
-
+		return(reverse_iterator(m_root));
 	}
 	const_reverse_iterator rend() const
 	{
-
-	}*/
+		return(const_reverse_iterator(m_root));
+	}
 
 /***********************************************************************************************************************************
 *															CAPACITY																
