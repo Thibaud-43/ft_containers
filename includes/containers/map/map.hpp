@@ -101,23 +101,30 @@ public:
 	:m_root(NULL), m_size(0), m_alloc(alloc), m_comp(comp)
 	{
 		init();
-
-
 	}
 
-	/*template <class InputIterator>
+	template <class InputIterator>
 	map (InputIterator first, InputIterator last,
 		const key_compare& comp = key_compare(),
 		const allocator_type& alloc = allocator_type())
+		:m_root(NULL), m_size(0), m_alloc(alloc), m_comp(comp)
 	{
-		
+		init();
+		insert(first, last);
 	}
 
-	map (const map& x)
+	map (const map& x):
+	m_root(NULL), m_size(0), m_alloc(x.m_alloc), m_comp(x.m_comp)
 	{
-
-	}*/
-
+		init();
+		insert(x.begin(), x.end());
+	}
+	map &operator=(const map<Key, T> &rhs)
+	{
+		clear();
+		insert(rhs.begin(), rhs.end());
+		return (*this);
+	};
 	~map()
 	{
 		free_tree(m_root);
@@ -191,11 +198,14 @@ public:
 ***********************************************************************************************************************************/
 	bool empty() const
 	{
-
+		if (m_size == 0)
+			return true;
+		return false;
+		
 	}
 	size_type size() const
 	{
-
+		return m_size;
 	}
 	
 
@@ -203,10 +213,16 @@ public:
 *															ELEMENT ACCESS																
 ***********************************************************************************************************************************/
 	
-	/*mapped_type& operator[] (const key_type& k)
+	mapped_type& operator[] (const key_type& k)
 	{
-
-	}*/
+		node_type	tmp = find_key(k, m_root);
+		if (tmp)
+			return(tmp->pair.second);
+		else
+		{
+			return (insert(value_type(k, mapped_type())).first->second);
+		}
+	}
 	
 
 
@@ -216,7 +232,7 @@ public:
 
 	pair<iterator,bool> insert (const value_type& val)
 	{
-		node_type	tmp = find(val.first, m_root);
+		node_type	tmp = find_key(val.first, m_root);
 		if (tmp)
 			return(pair<iterator, bool>(iterator(tmp), false));
 		else
@@ -227,10 +243,17 @@ public:
 	}
 
 
-/*
+
 	iterator insert (iterator position, const value_type& val)
 	{
-
+		node_type	tmp = find_key(val.first, m_root);
+		if (tmp)
+			return(tmp);
+		else
+		{
+			m_size++;
+			return (iterator(add_node(val, position.node())));
+		}
 	}
 
 
@@ -238,7 +261,12 @@ public:
 	template <class InputIterator>
 	void insert (InputIterator first, InputIterator last)
 	{
-
+		while (first != last)
+		{
+			insert(*first);
+			first++;
+		}
+		
 	}
 
 
@@ -246,28 +274,38 @@ public:
 	void erase (iterator position)
 	{
 
+		remove_node(position.node());
+		m_size--;
 	}
 
 
 
 	size_type erase (const key_type& k)
 	{
-
+		int count = 0;
+		node_type	elem;
+		while ((elem = find_key(k, m_root)))
+		{
+			erase(iterator(elem));
+			++count;
+		};
+		return (count);
 	}
 
 
 
 	void erase (iterator first, iterator last)
 	{
-
+		while (first != last)
+			erase(first++);
 	}
-	void swap (map& x)
+	/*void swap (map& x)
 	{
 
 	}*/
 	void clear()
-	{
-
+	{	
+		erase(begin(), end());
 	}
 
 /***********************************************************************************************************************************
@@ -276,25 +314,27 @@ public:
 
 	key_compare key_comp() const
 	{
-
+		return m_comp;
 	}
 	value_compare value_comp() const
 	{
-
+		return this->value_compare;
 	}
 
 /***********************************************************************************************************************************
 *															OPERATIONS														
 ***********************************************************************************************************************************/
-	/*iterator find (const key_type& k)
+	iterator find (const key_type& k)
 	{
-
+		node_type	tmp = find_key(k, m_root);
+		return(iterator(tmp));
 	}
 	const_iterator find (const key_type& k) const
 	{
-
+		node_type	tmp = find_key(k, m_root);
+		return(const_iterator(tmp));
 	}
-	size_type count (const key_type& k) const
+	/*size_type count (const key_type& k) const
 	{
 
 	}
@@ -373,14 +413,14 @@ allocator_type get_allocator() const
 			elem->end = end;
 			return elem;
 		}
-		node_type		find(key_type key, node_type current)
+		node_type		find_key(key_type key, node_type current)
 		{
 			node_type	ret1 = NULL;
 			node_type	ret2 = NULL;
 			if (current->left)
-				ret1 = find(key, current->left);
+				ret1 = find_key(key, current->left);
 			if (current->right)
-				ret2 = find(key, current->right);
+				ret2 = find_key(key, current->right);
 			if (current->pair.first == key)
 			{
 				return current;
@@ -400,7 +440,7 @@ allocator_type get_allocator() const
 		{
 			if (current->end_branch)
 			{
-				if (pair > current->pair)
+				if (pair.first > current->pair.first)
 				{
 					if (current->right && current->right->end)
 					{
@@ -423,12 +463,52 @@ allocator_type get_allocator() const
 					return(current->left);
 				}
 			}
-			else if (pair > current->pair)
+			else if (pair.first > current->pair.first)
 				 return(add_node(pair, current->right));
 			else
 				return(add_node(pair, current->left));
 		}
-
+		void	remove_node(node_type current)
+		{
+				node_type parent = current->parent;
+				if (!current->left && !current->right)
+				{
+					if (parent->right == current)
+						parent->right = 0;
+					else
+						parent->left = 0;
+					delete current;
+					return ;
+				}
+				if (current->right && !current->left)
+				{
+					if (parent->right == current)
+						parent->right = current->right;
+					else
+						parent->left = current->right;
+					current->right->parent = parent;
+					delete current;
+					return ;
+				}
+				if (current->left && !current->right)
+				{
+					if (parent->right == current)
+						parent->right = current->left;
+					else
+						parent->left = current->left;
+					current->left->parent = parent;
+					delete current;
+					return ;
+				}
+				node_type next = (++iterator(current)).node();
+				/*if (!next)
+					next = (--iterator(current)).node();*/
+				pair<key_type, mapped_type>	tmp;
+				tmp = current->pair;
+				current->pair = next->pair;
+				next->pair = tmp;
+				remove_node(next);
+		}
 		void	free_tree(node_type current)
 		{
 			if (current->left)

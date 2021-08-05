@@ -88,7 +88,10 @@ public:
 		m_ptr = rhs.m_ptr;
 		return (*this);
 	}
-
+	BNode<Key, T> *		node()
+	{
+		return m_ptr;
+	}
 	bool			operator== (const MapIterator ptr) const
 	{
 		return(m_ptr == ptr.m_ptr);

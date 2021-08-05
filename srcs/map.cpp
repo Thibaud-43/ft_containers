@@ -45,6 +45,12 @@ public:
 	}
 };
 
+bool fncomp (char lhs, char rhs) {return lhs<rhs;}
+
+struct classcomp {
+  bool operator() (const char& lhs, const char& rhs) const
+  {return lhs<rhs;}
+};
 
 int main(void)
 {
@@ -53,54 +59,174 @@ int main(void)
 	std::cout << "TEST CONSTRUCTORS" << std::endl << std::endl;
 	{
 		clock.setBeginStd();
-		std::map<std::string, int>	test2;
-		std::map<int, int>	test;
-		test.insert(std::make_pair(10, 10));
-		test2.insert(std::make_pair("test", 10));
-		test2.insert(std::make_pair("test1", 10));
-		test2.insert(std::make_pair("test4", 10));
-		test2.insert(std::make_pair("test5", 10));
-		std::map<std::string, int>::iterator it = test2.begin();
-		std::map<std::string, int>::iterator it2 = test2.end();
-		it2--;
-		for (;it2 != it; it2--)
-		{
-			std::cout << it2->first << std::endl;
-		}
-		it2 = test2.end();
-		for ( ;it != it2; it++)
-		{
-			std::cout << it->first << std::endl;
-		}
+		std::map<char,int> first;
+		first['d']=5;
+
+		first['a']=10;
+		first['b']=30;
+		first['c']=50;
+		std::cout << "first contains:\n";
+		std::map<char,int>::iterator it = first.begin();
+		for (it=first.begin(); it!=first.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		std::map<char,int> second (first.begin(),first.end());
+
+		std::map<char,int> third (second);
+
+		std::map<char,int,classcomp> fourth;                 // class as Compare
+
+		bool(*fn_pt)(char,char) = fncomp;
+		std::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
+
 		clock.printStdTime();
 	}
 	{
 		clock.setBeginFt();
 		using namespace ft;
-		map<std::string, int>	test2;
-		test2.insert(make_pair("test", 10));
-		test2.insert(make_pair("test1", 10));
-		test2.insert(make_pair("test4", 10));
-		test2.insert(make_pair("test5", 10));
+		map<char,int> first;
+		first['d']=5;
 
-		map<std::string, int>::iterator it = test2.begin();
-		map<std::string, int>::iterator it2 = test2.end();
-		it2--;
-		for (;it2 != it; it2--)
-		{
-			std::cout << it2->first << std::endl;
-		}
-		it2 = test2.end();
-		for ( ;it != it2; it++)
-		{
-			std::cout << it->first << std::endl;
-		}
-		
+		first['a']=10;
+		first['b']=30;
+		first['c']=50;
+
+		std::cout << "first contains:\n";
+		map<char,int>::iterator it = first.begin();
+		for (it=first.begin(); it!=first.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+		map<char,int> second (first.begin(),first.end());
+
+		map<char,int> third (second);
+
+		map<char,int,classcomp> fourth;                 // class as Compare
+
+		bool(*fn_pt)(char,char) = fncomp;
+		map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
+
 		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
 
-	std::cout << "TEST INSER" << std::endl << std::endl;
+
+	std::cout << "TEST ERASE" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		std::map<char,int> mymap;
+		std::map<char,int>::iterator it;
+
+		// insert some values:
+		mymap['a']=10;
+		mymap['b']=20;
+		mymap['c']=30;
+		mymap['d']=40;
+		mymap['e']=50;
+		mymap['f']=60;
+
+		it=mymap.find('b');
+		mymap.erase (it);                   // erasing by iterator
+
+		mymap.erase ('c');                  // erasing by key
+
+		it=mymap.find ('e');
+		mymap.erase ( it, mymap.end() );    // erasing by range
+
+		// show content:
+		for (it=mymap.begin(); it!=mymap.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+
+		clock.printStdTime();
+	}
+	{
+		clock.setBeginFt();
+		using namespace ft;
+		map<char,int> mymap;
+		map<char,int>::iterator it;
+
+		// insert some values:
+		mymap['a']=10;
+		mymap['b']=20;
+		mymap['c']=30;
+		mymap['d']=40;
+		mymap['e']=50;
+		mymap['f']=60;
+
+		it=mymap.find('b');
+		mymap.erase (it);                   // erasing by iterator
+
+		mymap.erase ('c');                  // erasing by key
+
+		it=mymap.find ('e');
+		mymap.erase ( it, mymap.end() );    // erasing by range
+
+		// show content:
+		for (it=mymap.begin(); it!=mymap.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+
+		clock.printFtTime();
+	}
+	std::cout << std::endl << std::endl;
+
+
+
+	std::cout << "TEST =" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		std::map<char,int> first;
+		std::map<char,int> second;
+		
+		first['j']=12;
+		first['x']=8;
+		first['y']=16;
+		first['z']=32;
+
+		second=first;                // second now contains 3 ints
+		first=std::map<char,int>();  // and first is now empty
+
+		std::cout << "Size of first: " << first.size() << '\n';
+		std::cout << "Size of second: " << second.size() << '\n';
+		clock.printStdTime();
+	}
+	{
+		clock.setBeginFt();
+		using namespace ft;
+		map<char,int> first;
+		map<char,int> second;
+		
+		first['j']=12;
+		first['x']=8;
+		first['y']=16;
+		first['z']=32;
+
+		second=first;            // second now contains 3 ints
+		first=map<char,int>();  // and first is now empty
+
+		std::cout << "Size of first: " << first.size() << '\n';
+		std::cout << "Size of second: " << second.size() << '\n';
+		clock.printFtTime();
+	}
+
+
+
+
+
+
+
+
+
+
+	std::cout << std::endl << std::endl;
+		std::cout << "TEST =" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		clock.printStdTime();
+	}
+	{
+		clock.setBeginFt();
+		using namespace ft;
+		clock.printFtTime();
+	}
+	std::cout << std::endl << std::endl;
+	std::cout << "TEST INSERT" << std::endl << std::endl;
 	{
 		clock.setBeginStd();
 		std::map<char,int> mymap;
@@ -144,14 +270,31 @@ int main(void)
 		// first insert function version (single parameter):
 		mymap.insert ( std::pair<char,int>('a',100) );
 		mymap.insert ( std::pair<char,int>('z',200) );
-		std::map<char, int>::reverse_iterator it = mymap.rbegin();
-		std::map<char, int>::reverse_iterator it2 = mymap.rend();
-		
-		for (; it != it2; it++)
-		{
-			std::cout << it->first << std::endl;
+
+		std::pair<std::map<char,int>::iterator,bool> ret;
+		ret = mymap.insert ( std::pair<char,int>('z',500) );
+		if (ret.second==false) {
+			std::cout << "element 'z' already existed";
+			std::cout << " with a value of " << ret.first->second << '\n';
 		}
-		
+		// second insert function version (with hint position):
+		std::map<char,int>::iterator it = mymap.begin();
+		mymap.insert (it, std::pair<char,int>('b',300));  // max efficiency inserting
+		mymap.insert (it, std::pair<char,int>('c',400));  // no max efficiency inserting
+
+		// third insert function version (range insertion):
+		std::map<char,int> anothermap;
+		anothermap.insert(mymap.begin(),mymap.find('c'));
+
+		// showing contents:
+		std::cout << "mymap contains:\n";
+		for (it=mymap.begin(); it!=mymap.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+
+		std::cout << "anothermap contains:\n";
+		for (it=anothermap.begin(); it!=anothermap.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+
 		clock.printStdTime();
 	}
 	{
@@ -162,15 +305,33 @@ int main(void)
 		// first insert function version (single parameter):
 		mymap.insert ( pair<char,int>('a',100) );
 		mymap.insert ( pair<char,int>('z',200) );
-		map<char, int>::reverse_iterator it = mymap.rbegin();
-		map<char, int>::reverse_iterator it2 = mymap.rend();
 
-		for (; it != it2; it++)
-		{
-			std::cout << it->first << std::endl;
+		pair<map<char,int>::iterator,bool> ret;
+		ret = mymap.insert ( pair<char,int>('z',500) );
+		if (ret.second==false) {
+			std::cout << "element 'z' already existed";
+			std::cout << " with a value of " << ret.first->second << '\n';
 		}
 
-		clock.printStdTime();
+		// second insert function version (with hint position):
+		map<char,int>::iterator it = mymap.begin();
+		mymap.insert (it, pair<char,int>('b',300));  // max efficiency inserting
+		mymap.insert (it, pair<char,int>('c',400));  // no max efficiency inserting
+
+
+		// third insert function version (range insertion):
+		map<char,int> anothermap;
+		anothermap.insert(mymap.begin(),mymap.find('c'));
+
+		// showing contents:
+		std::cout << "mymap contains:\n";
+		for (it=mymap.begin(); it!=mymap.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+
+		std::cout << "anothermap contains:\n";
+		for (it=anothermap.begin(); it!=anothermap.end(); ++it)
+			std::cout << it->first << " => " << it->second << '\n';
+
 		clock.printFtTime();
 	}
 	std::cout << std::endl << std::endl;
