@@ -13,6 +13,33 @@
 namespace ft
 {
 
+
+template<class InputIt1, class InputIt2>
+bool equal(InputIt1 first1, InputIt1 last1, 
+           InputIt2 first2)
+{
+    for (; first1 != last1; ++first1, ++first2) 
+	{
+        if (!(*first1 == *first2)) 
+		{
+            return false;
+        }
+    }
+    return true;
+}
+
+template<class InputIt1, class InputIt2>
+bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
+                             InputIt2 first2, InputIt2 last2)
+{
+    for ( ; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2 ) 
+	{
+        if (*first1 < *first2) return true;
+        if (*first2 < *first1) return false;
+    }
+    return (first1 == last1) && (first2 != last2);
+}
+
 template <class Arg1, class Arg2, class Result>
 struct binary_function 
 {
@@ -207,7 +234,10 @@ public:
 	{
 		return m_size;
 	}
-	
+	size_type max_size(void) const
+	{
+		return (m_alloc.max_size());
+	};
 
 /***********************************************************************************************************************************
 *															ELEMENT ACCESS																
@@ -299,10 +329,23 @@ public:
 		while (first != last)
 			erase(first++);
 	}
-	/*void swap (map& x)
+	void swap (map& x)
 	{
+		node_type		tmp = x.m_root;
+		size_type		tmp_size	= x.size();
+		key_compare		tmp_comp	= x.m_comp;
+		allocator_type	tmp_alloc = x.m_alloc;
+	
+		x.m_root = this->m_root;
+		x.m_size = this->m_size;
+		x.m_alloc = this->m_alloc;
+		x.m_comp = this->m_comp;
+		this->m_root = tmp;
+		this->m_size = tmp_size;
+		this->m_alloc = tmp_alloc;
+		this->m_comp = tmp_comp;
 
-	}*/
+	}
 	void clear()
 	{	
 		erase(begin(), end());
@@ -334,41 +377,73 @@ public:
 		node_type	tmp = find_key(k, m_root);
 		return(const_iterator(tmp));
 	}
-	/*size_type count (const key_type& k) const
+	size_type count (const key_type& k) const
 	{
-
+		node_type	tmp = find_key(k, m_root);
+		if (!tmp)
+			return 0;
+		return 1;
 	}
 	iterator lower_bound (const key_type& k)
 	{
-
+		iterator	tmp = begin();
+		while (tmp != end())
+		{
+			if(m_comp(tmp->first, k) <= 0)
+				return((tmp));
+			tmp++;
+		}
+		return ((tmp));
+		
 	}
 	const_iterator lower_bound (const key_type& k) const
 	{
-
+		const_iterator	tmp = begin();
+		while (tmp != end())
+		{
+			if(m_comp(tmp->first, k) <= 0)
+				return((tmp));
+			tmp++;
+		}
+		return ((tmp));
 	}
 	iterator upper_bound (const key_type& k)
 	{
-
+		iterator	tmp = begin();
+		while (tmp != end())
+		{
+			if(m_comp(tmp->first, k) <= 0 && tmp->first != k)
+				return((tmp));
+			tmp++;
+		}
+		return ((tmp));
 	}
 	const_iterator upper_bound (const key_type& k) const
 	{
-
+		const_iterator	tmp = begin();
+		while (tmp != end())
+		{
+			if(m_comp(tmp->first, k) <= 0 && tmp->first != k)
+				return((tmp));
+			tmp++;
+		}
+		return ((tmp));
 	}
 	pair<const_iterator,const_iterator> equal_range (const key_type& k) const
 	{
-
+		return (pair<const_iterator, const_iterator>(this->lower_bound(k), this->upper_bound(k)));
 	}
 	pair<iterator,iterator>             equal_range (const key_type& k)
 	{
-
-	}*/
+		return (pair<iterator, iterator>(this->lower_bound(k), this->upper_bound(k)));
+	}
 /***********************************************************************************************************************************
 *															ALLOCATOR																
 ***********************************************************************************************************************************/
-allocator_type get_allocator() const
-{
-
-}
+	allocator_type get_allocator() const
+	{
+		return m_alloc;
+	}
 
 
 /***********************************************************************************************************************************
@@ -413,7 +488,7 @@ allocator_type get_allocator() const
 			elem->end = end;
 			return elem;
 		}
-		node_type		find_key(key_type key, node_type current)
+		node_type		find_key(key_type key, node_type current) const
 		{
 			node_type	ret1 = NULL;
 			node_type	ret2 = NULL;
@@ -517,9 +592,53 @@ allocator_type get_allocator() const
 				free_tree(current->right);
 			delete current;
 		}
-
 };
-
+	template <class Key, class T, class Compare, class Alloc>
+	void swap(ft::map<Key, T, Compare, Alloc> &x, ft::map<Key, T, Compare, Alloc> &y)
+	{
+		x.swap(y);
+	};
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator==(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return (false);
+		typename ft::map<Key, T, Compare, Alloc>::const_iterator it = rhs.begin();
+		typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = lhs.begin();
+		while (it != rhs.end())
+		{
+			if (*it != *it2)
+				return (false);
+			++it2;
+			++it;
+		}
+		return (true);
+	};
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator!=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	{
+		return (!(lhs == rhs));
+	};
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	{
+		return(lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	};
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	{
+		return (!(lhs > rhs) && !(lhs == rhs));
+	};
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	{
+		return (!(lhs < rhs));
+	};
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	{
+		return (!(lhs > rhs));
+	};
 
 }
 #endif

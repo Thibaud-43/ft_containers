@@ -1,4 +1,4 @@
-#include <map>
+#include <map.hpp>
 #include <ctime>
 #include <string>
 #include <iostream>
@@ -16,11 +16,11 @@ public:
 	Time(/* args */){};
 	~Time(){};
 
-	void	setBeginStd(void)
+	void	setBeginFt(void)
 	{
 		m_begin_std = clock();
 	}
-	void	setBeginFt(void)
+	void	setBeginStd(void)
 	{
 		m_begin_ft = clock();
 	}
@@ -59,32 +59,32 @@ int main(void)
 {
 	Time	clock;
 	std::ofstream fs;
-  	fs.open ("results/map.txt");
+  	fs.open ("results/ft_map.txt");
 	if (!fs.is_open())
     {    
         std::cout << "Error with file" << std::endl;
     }
 	fs << "TEST CONSTRUCTORS" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> first;
+		clock.setBeginFt();
+		ft::map<char,int> first;
 		first['d']=5;
 
 		first['a']=10;
 		first['b']=30;
 		first['c']=50;
 		fs << "first contains:\n";
-		std::map<char,int>::iterator it = first.begin();
+		ft::map<char,int>::iterator it = first.begin();
 		for (it=first.begin(); it!=first.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
-		std::map<char,int> second (first.begin(),first.end());
+		ft::map<char,int> second (first.begin(),first.end());
 
-		std::map<char,int> third (second);
+		ft::map<char,int> third (second);
 
-		std::map<char,int,classcomp> fourth;                 // class as Compare
+		ft::map<char,int,classcomp> fourth;                 // class as Compare
 
 		bool(*fn_pt)(char,char) = fncomp;
-		std::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
+		ft::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
 
 		clock.printStdTime();
 	}
@@ -92,9 +92,9 @@ int main(void)
 
 	fs << "TEST =" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> first;
-		std::map<char,int> second;
+		clock.setBeginFt();
+		ft::map<char,int> first;
+		ft::map<char,int> second;
 		
 		first['j']=12;
 		first['x']=8;
@@ -102,25 +102,25 @@ int main(void)
 		first['z']=32;
 
 		second=first;                // second now contains 3 ints
-		first=std::map<char,int>();  // and first is now empty
+		first=ft::map<char,int>();  // and first is now empty
 
 		fs << "Size of first: " << first.size() << '\n';
 		fs << "Size of second: " << second.size() << '\n';
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 
 	fs << "TEST BEGIN END" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 
 		mymap['b'] = 100;
 		mymap['a'] = 200;
 		mymap['c'] = 300;
 
 		// show content:
-		for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 		clock.printStdTime();
 	}
@@ -128,15 +128,15 @@ int main(void)
 
 	fs << "TEST RBEGIN REND" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 
 		mymap['x'] = 100;
 		mymap['y'] = 200;
 		mymap['z'] = 300;
 
 		// show content:
-		std::map<char,int>::reverse_iterator rit;
+		ft::map<char,int>::reverse_iterator rit;
 		for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
 			fs << rit->first << " => " << rit->second << '\n';
 
@@ -145,8 +145,8 @@ int main(void)
 	fs << std::endl << std::endl;
 	fs << "TEST EMPTY" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 
 		mymap['a']=10;
 		mymap['b']=20;
@@ -163,8 +163,8 @@ int main(void)
 	fs << std::endl << std::endl;
 		fs << "TEST SIZE" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 		mymap['a']=101;
 		mymap['b']=202;
 		mymap['c']=302;
@@ -176,9 +176,9 @@ int main(void)
 	fs << std::endl << std::endl;
 	fs << "TEST MAXSIZE" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
+		clock.setBeginFt();
 		int i;
-		std::map<int,int> mymap;
+		ft::map<int,int> mymap;
 
 		if (mymap.max_size()>1000)
 		{
@@ -192,8 +192,8 @@ int main(void)
 	fs << std::endl << std::endl;
 	fs << "TEST []" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,std::string> mymap;
+		clock.setBeginFt();
+		ft::map<char,std::string> mymap;
 
 		mymap['a']="an element";
 		mymap['b']="another element";
@@ -211,27 +211,27 @@ int main(void)
 	fs << std::endl << std::endl;
 	fs << "TEST INSERT" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		 std::map<char,int> mymap;
+		clock.setBeginFt();
+		 ft::map<char,int> mymap;
 
 		// first insert function version (single parameter):
-		mymap.insert ( std::pair<char,int>('a',100) );
-		mymap.insert ( std::pair<char,int>('z',200) );
+		mymap.insert ( ft::pair<char,int>('a',100) );
+		mymap.insert ( ft::pair<char,int>('z',200) );
 
-		std::pair<std::map<char,int>::iterator,bool> ret;
-		ret = mymap.insert ( std::pair<char,int>('z',500) );
+		ft::pair<ft::map<char,int>::iterator,bool> ret;
+		ret = mymap.insert ( ft::pair<char,int>('z',500) );
 		if (ret.second==false) {
 			fs << "element 'z' already existed";
 			fs << " with a value of " << ret.first->second << '\n';
 		}
 
 		// second insert function version (with hint position):
-		std::map<char,int>::iterator it = mymap.begin();
-		mymap.insert (it, std::pair<char,int>('b',300));  // max efficiency inserting
-		mymap.insert (it, std::pair<char,int>('c',400));  // no max efficiency inserting
+		ft::map<char,int>::iterator it = mymap.begin();
+		mymap.insert (it, ft::pair<char,int>('b',300));  // max efficiency inserting
+		mymap.insert (it, ft::pair<char,int>('c',400));  // no max efficiency inserting
 
 		// third insert function version (range insertion):
-		std::map<char,int> anothermap;
+		ft::map<char,int> anothermap;
 		anothermap.insert(mymap.begin(),mymap.find('c'));
 
 		// showing contents:
@@ -247,9 +247,9 @@ int main(void)
 	fs << std::endl << std::endl;
 	fs << "TEST ERASE" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
-		std::map<char,int>::iterator it;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
+		ft::map<char,int>::iterator it;
 
 		// insert some values:
 		mymap['a']=10;
@@ -276,8 +276,8 @@ int main(void)
 	fs << std::endl << std::endl;
 		fs << "TEST SWAP" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> foo,bar;
+		clock.setBeginFt();
+		ft::map<char,int> foo,bar;
 
 		foo['x']=100;
 		foo['y']=200;
@@ -289,11 +289,11 @@ int main(void)
 		foo.swap(bar);
 
 		fs << "foo contains:\n";
-		for (std::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
+		for (ft::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
 		fs << "bar contains:\n";
-		for (std::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+		for (ft::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
 		clock.printStdTime();
@@ -301,15 +301,15 @@ int main(void)
 	fs << std::endl << std::endl;
 		fs << "TEST CLEAR" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 
 		mymap['x']=100;
 		mymap['y']=200;
 		mymap['z']=300;
 
 		fs << "mymap contains:\n";
-		for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
 		mymap.clear();
@@ -317,17 +317,17 @@ int main(void)
 		mymap['b']=2202;
 
 		fs << "mymap contains:\n";
-		for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 		clock.printStdTime();
 	}
 	fs << std::endl << std::endl;
 		fs << "TEST KEY COMPARE" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 
-		std::map<char,int>::key_compare mycomp = mymap.key_comp();
+		ft::map<char,int>::key_compare mycomp = mymap.key_comp();
 
 		mymap['a']=100;
 		mymap['b']=200;
@@ -337,7 +337,7 @@ int main(void)
 
 		char highest = mymap.rbegin()->first;     // key value of last element
 
-		std::map<char,int>::iterator it = mymap.begin();
+		ft::map<char,int>::iterator it = mymap.begin();
 		do {
 			fs << it->first << " => " << it->second << '\n';
 		} while ( mycomp((*it++).first, highest) );
@@ -349,9 +349,9 @@ int main(void)
 	fs << std::endl << std::endl;
 		fs << "TEST FIND" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
-		std::map<char,int>::iterator it;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
+		ft::map<char,int>::iterator it;
 
 		mymap['a']=50;
 		mymap['b']=100;
@@ -373,8 +373,8 @@ int main(void)
 	fs << std::endl << std::endl;
 		fs << "TEST COUNT" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
 		char c;
 
 		mymap ['a']=101;
@@ -395,9 +395,9 @@ int main(void)
 	fs << std::endl << std::endl;
 			fs << "TEST UPPER/LOWER BOND" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		std::map<char,int> mymap;
-		std::map<char,int>::iterator itlow,itup;
+		clock.setBeginFt();
+		ft::map<char,int> mymap;
+		ft::map<char,int>::iterator itlow,itup;
 
 		mymap['a']=20;
 		mymap['b']=40;
@@ -411,7 +411,7 @@ int main(void)
 		mymap.erase(itlow,itup);        // erases [itlow,itup)
 
 		// print content:
-		for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
 		clock.printStdTime();
@@ -420,14 +420,14 @@ int main(void)
 	fs << std::endl << std::endl;
 			fs << "TEST EQUAL RANGE" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
-		  std::map<char,int> mymap;
+		clock.setBeginFt();
+		  ft::map<char,int> mymap;
 
 		mymap['a']=10;
 		mymap['b']=20;
 		mymap['c']=30;
 
-		std::pair<std::map<char,int>::iterator,std::map<char,int>::iterator> ret;
+		ft::pair<ft::map<char,int>::iterator,ft::map<char,int>::iterator> ret;
 		ret = mymap.equal_range('b');
 
 		fs << "lower bound points to: ";
@@ -441,16 +441,16 @@ int main(void)
 	fs << std::endl << std::endl;
 			fs << "TEST GET ALLOCATOR" << std::endl << std::endl;
 	{
-		clock.setBeginStd();
+		clock.setBeginFt();
 		  int psize;
-		std::map<char,int> mymap;
-		std::pair<const char,int>* p;
+		ft::map<char,int> mymap;
+		ft::pair<const char,int>* p;
 
 		// allocate an array of 5 elements using mymap's allocator:
 		p=mymap.get_allocator().allocate(5);
 
 		// assign some values to array
-		psize = sizeof(std::map<char,int>::value_type)*5;
+		psize = sizeof(ft::map<char,int>::value_type)*5;
 
 		fs << "The allocated array has a size of " << psize << " bytes.\n";
 
