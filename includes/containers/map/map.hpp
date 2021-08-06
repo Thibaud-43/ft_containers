@@ -64,7 +64,6 @@ struct BNode
 	BNode 				*left;
 	BNode 				*right;
 	BNode 				*parent;
-	bool 				end_branch;
 	bool 				end;
 	bool				root;
 };
@@ -213,11 +212,11 @@ public:
 	}
 	reverse_iterator rend()
 	{
-		return(reverse_iterator(m_root));
+		return(--reverse_iterator(m_root));
 	}
 	const_reverse_iterator rend() const
 	{
-		return(const_reverse_iterator(m_root));
+		return(--const_reverse_iterator(m_root));
 	}
 
 /***********************************************************************************************************************************
@@ -452,6 +451,7 @@ public:
 	
 	private :
 		node_type		m_root;
+		node_type		m_end;
 		size_type		m_size;
 		allocator_type	m_alloc;
 		key_compare		m_comp;
@@ -470,20 +470,19 @@ public:
 
 		void	init(void)
 		{
-			m_root = create_node(value_type(key_type(), mapped_type()), NULL, true, true, false);
-			m_root->right = create_node(value_type(key_type(), mapped_type()), NULL, true, false, true);
+			m_root = create_node(value_type(key_type(), mapped_type()), NULL, false, true);
+			m_root->right = create_node(value_type(key_type(), mapped_type()), m_root, true);
 		}
 
-		node_type	create_node(value_type	pair, node_type parent, bool end_branch, bool root = false, bool end = false, node_type node_end = NULL)
+		node_type	create_node(value_type	pair, node_type parent, bool end = false, bool root = false)
 		{
 
 			node_type	elem = new	BNode<key_type, mapped_type>();
 
 			elem->pair = pair;
 			elem->parent = parent;
-			elem->right = node_end;
+			elem->right = NULL;
 			elem->left = NULL;
-			elem->end_branch = end_branch;
 			elem->root = root;
 			elem->end = end;
 			return elem;
@@ -513,35 +512,44 @@ public:
 		}
 		node_type		add_node(pair<key_type, mapped_type> pair, node_type current)
 		{
-			if (current->end_branch)
+			if (pair.first > current->pair.first)
 			{
-				if (pair.first > current->pair.first)
+				if(current->right && !current->right->end)
 				{
-					if (current->right && current->right->end)
+					return add_node(pair, current->right);
+				}
+				else
+				{
+					if (!current->right)
 					{
-						current->end_branch = false;
-						current->right = create_node(pair, current, true, false, false, current->right);
-						current->right->right->parent = current->right;
+						current->right = create_node(pair, current);
 						return(current->right);
 					}
 					else
 					{
-						current->end_branch = false;
-						current->right = create_node(pair, current, true);
+						node_type	tmp = current->right;
+						current->right = create_node(pair, current);
+						current->right->right = tmp;
+						current->right->right->parent = current->right;
 						return(current->right);
 					}
 				}
+			}
+			else
+			{
+				if (current->left)
+				{
+					return add_node(pair, current->left);
+				}
 				else
 				{
-					current->end_branch = false;
 					current->left = create_node(pair, current, true);
 					return(current->left);
+
 				}
+				
 			}
-			else if (pair.first > current->pair.first)
-				 return(add_node(pair, current->right));
-			else
-				return(add_node(pair, current->left));
+			
 		}
 		void	remove_node(node_type current)
 		{

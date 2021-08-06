@@ -16,11 +16,11 @@ public:
 	Time(/* args */){};
 	~Time(){};
 
-	void	setBeginFt(void)
+	void	setBeginStd(void)
 	{
 		m_begin_std = clock();
 	}
-	void	setBeginStd(void)
+	void	setBeginFt(void)
 	{
 		m_begin_ft = clock();
 	}
@@ -33,18 +33,8 @@ public:
 	void	printFtTime(void)
 	{
 		m_end_ft = clock();
-		if (m_end_ft - m_begin_ft < 20 * (m_end_std - m_begin_std))
-		{
-			std::cout << "\033[1;32m";
-			std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
-			std::cout << "\033[0m\n";
-		}
-		else
-		{
-			std::cout << "\033[1;31m";
-			std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
-			std::cout << "\033[0m\n";
-		}
+		std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
+		
 	}
 };
 
@@ -86,7 +76,7 @@ int main(void)
 		bool(*fn_pt)(char,char) = fncomp;
 		ft::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 
@@ -122,7 +112,7 @@ int main(void)
 		// show content:
 		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 
@@ -130,9 +120,9 @@ int main(void)
 	{
 		clock.setBeginFt();
 		ft::map<char,int> mymap;
+		mymap['y'] = 200;
 
 		mymap['x'] = 100;
-		mymap['y'] = 200;
 		mymap['z'] = 300;
 
 		// show content:
@@ -140,7 +130,7 @@ int main(void)
 		for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
 			fs << rit->first << " => " << rit->second << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 	fs << "TEST EMPTY" << std::endl << std::endl;
@@ -157,7 +147,7 @@ int main(void)
 		fs << mymap.begin()->first << " => " << mymap.begin()->second << '\n';
 		mymap.erase(mymap.begin());
 		}
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 
 	fs << std::endl << std::endl;
@@ -171,7 +161,7 @@ int main(void)
 
 		fs << "mymap.size() is " << mymap.size() << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 	fs << "TEST MAXSIZE" << std::endl << std::endl;
@@ -187,7 +177,7 @@ int main(void)
 		}
 		else fs << "The map could not hold 1000 elements.\n";
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 	fs << "TEST []" << std::endl << std::endl;
@@ -206,7 +196,7 @@ int main(void)
 
 		fs << "mymap now contains " << mymap.size() << " elements.\n";
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 	fs << "TEST INSERT" << std::endl << std::endl;
@@ -242,7 +232,7 @@ int main(void)
 		fs << "anothermap contains:\n";
 		for (it=anothermap.begin(); it!=anothermap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 	fs << "TEST ERASE" << std::endl << std::endl;
@@ -271,7 +261,7 @@ int main(void)
 		for (it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 		fs << "TEST SWAP" << std::endl << std::endl;
@@ -296,7 +286,7 @@ int main(void)
 		for (ft::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 		fs << "TEST CLEAR" << std::endl << std::endl;
@@ -319,7 +309,7 @@ int main(void)
 		fs << "mymap contains:\n";
 		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 		fs << "TEST KEY COMPARE" << std::endl << std::endl;
@@ -344,7 +334,7 @@ int main(void)
 
 		fs << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 		fs << "TEST FIND" << std::endl << std::endl;
@@ -368,7 +358,7 @@ int main(void)
 		fs << "c => " << mymap.find('c')->second << '\n';
 		fs << "d => " << mymap.find('d')->second << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 		fs << "TEST COUNT" << std::endl << std::endl;
@@ -390,7 +380,7 @@ int main(void)
 				fs << " is not an element of mymap.\n";
 		}
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 			fs << "TEST UPPER/LOWER BOND" << std::endl << std::endl;
@@ -414,7 +404,7 @@ int main(void)
 		for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 
 	fs << std::endl << std::endl;
@@ -436,7 +426,7 @@ int main(void)
 		fs << "upper bound points to: ";
 		fs << ret.second->first << " => " << ret.second->second << '\n';
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 			fs << "TEST GET ALLOCATOR" << std::endl << std::endl;
@@ -456,7 +446,7 @@ int main(void)
 
 		mymap.get_allocator().deallocate(p,5);
 
-		clock.printStdTime();
+		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 
