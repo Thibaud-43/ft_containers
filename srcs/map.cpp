@@ -33,18 +33,7 @@ public:
 	void	printFtTime(void)
 	{
 		m_end_ft = clock();
-		if (m_end_ft - m_begin_ft < 20 * (m_end_std - m_begin_std))
-		{
-			std::cout << "\033[1;32m";
-			std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
-			std::cout << "\033[0m\n";
-		}
-		else
-		{
-			std::cout << "\033[1;31m";
-			std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
-			std::cout << "\033[0m\n";
-		}
+		std::cout << "Total time elapsed: " << m_end_ft - m_begin_ft << std::endl << std::endl;
 	}
 };
 
