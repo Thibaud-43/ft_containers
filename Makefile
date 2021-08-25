@@ -3,7 +3,7 @@ SRCS_MAP		=	map.cpp
 SRCS_FTVECTOR	=	ft_vector.cpp		
 SRCS_FTMAP		=	ft_map.cpp		
 SRCS_STACK		=	stack.cpp		
-SRCS_FTSTACK	=	stack.cpp		
+SRCS_FTSTACK	=	ft_stack.cpp		
 
 
 VECTOR	= vector
@@ -55,6 +55,24 @@ $(STACK): $(OBJS_STACK)
 
 $(FTSTACK): $(OBJS_FTSTACK)
 	$(CXX) $(OBJS_FTSTACK) $(INC) -o $(FTSTACK)
+
+test_vector:
+	./vector
+	./ft_vector
+	diff ./results/ft_vector.txt ./results/vector.txt
+
+test_map:
+	./map
+	./ft_map
+	diff ./results/ft_map.txt ./results/map.txt
+
+test_stack:
+	./stack
+	./ft_stack
+	diff ./results/ft_stack.txt ./results/stack.txt
+
+test_all: test_vector test_map test_stack
+
 clean: 
 	$(RM) $(OBJS_VECTOR) $(OBJS_MAP) $(OBJS_FTVECTOR) $(OBJS_FTMAP) $(OBJS_STACK) $(OBJS_FTSTACK) $(OBJS_PATH)
 	$(RM) results
