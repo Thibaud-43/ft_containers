@@ -566,6 +566,17 @@ int main(void)
 		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
+		fs << "OTHER TEST" << std::endl << std::endl;
+	{
+		clock.setBeginFt();
+		using namespace ft;
+		vector<int>		vec;
+		vector<int>::iterator	it = vec.begin();
+		const vector<int>::iterator	it2 = vec.end();
+		fs << (it2 == it) << std::endl;
+		clock.printFtTime();
+	}
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }

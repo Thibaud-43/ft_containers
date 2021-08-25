@@ -596,6 +596,16 @@ int main(void)
 	}
 
 	fs << std::endl << std::endl;
+	fs << "OTHER TEST" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		std::vector<int>		vec;
+		std::vector<int>::iterator	it = vec.begin();
+		const std::vector<int>::iterator	it2 = vec.end();
+		fs << (it2 == it) << std::endl;
+		clock.printStdTime();
+	}
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }

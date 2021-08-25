@@ -7,20 +7,20 @@ SRCS_FTSTACK	=	ft_stack.cpp
 
 
 VECTOR	= vector
+STACK		= stack
 MAP		= map
 FTVECTOR	= ft_vector
 FTMAP		= ft_map
-STACK		= stack
 FTSTACK	= ft_stack
 
-CXX		= clang++
+CXX		= clang++ -g -fsanitize=address
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 RM		= rm -rf
 
 SRCS_PATH			=	./srcs/
 OBJS_PATH			=	.objs/
-INC					= -I includes/containers/vector -I includes/containers/map -I includes/containers/stack -I includes/iterators
+INC					= -I includes/iterators -I includes/containers/vector -I includes/containers/map -I includes/containers/stack 
 
 
 OBJS_VECTOR		= $(addprefix $(OBJS_PATH),$(SRCS_VECTOR:.cpp=.o))

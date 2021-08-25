@@ -88,7 +88,7 @@ public:
 	typedef	Compare								key_compare;
 	class 	value_compare
 	{   
-		friend class map;
+		class map;
 		protected:
 			Compare comp;
 			value_compare (Compare c) : comp(c) 
@@ -331,18 +331,18 @@ public:
 	void swap (map& x)
 	{
 		node_type		tmp = x.m_root;
-		size_type		tmp_size	= x.size();
-		key_compare		tmp_comp	= x.m_comp;
-		allocator_type	tmp_alloc = x.m_alloc;
+		//size_type		tmp_size	= x.size();
+		//key_compare		tmp_comp	= x.m_comp;
+		//allocator_type	tmp_alloc = x.m_alloc;
 	
 		x.m_root = this->m_root;
-		x.m_size = this->m_size;
+		/*x.m_size = this->m_size;
 		x.m_alloc = this->m_alloc;
-		x.m_comp = this->m_comp;
+		x.m_comp = this->m_comp;*/
 		this->m_root = tmp;
-		this->m_size = tmp_size;
+		/*this->m_size = tmp_size;
 		this->m_alloc = tmp_alloc;
-		this->m_comp = tmp_comp;
+		this->m_comp = tmp_comp;*/
 
 	}
 	void clear()
@@ -476,8 +476,9 @@ public:
 
 		node_type	create_node(value_type	pair, node_type parent, bool end = false, bool root = false)
 		{
-
-			node_type	elem = new	BNode<key_type, mapped_type>();
+			std::allocator<BNode<key_type, mapped_type> >	alloc;
+			node_type elem = alloc.allocate(1);
+			//node_type	elem = new	BNode<key_type, mapped_type>();
 
 			elem->pair = pair;
 			elem->parent = parent;
@@ -553,52 +554,58 @@ public:
 		}
 		void	remove_node(node_type current)
 		{
-				node_type parent = current->parent;
-				if (!current->left && !current->right)
-				{
-					if (parent->right == current)
-						parent->right = 0;
-					else
-						parent->left = 0;
-					delete current;
-					return ;
-				}
-				if (current->right && !current->left)
-				{
-					if (parent->right == current)
-						parent->right = current->right;
-					else
-						parent->left = current->right;
-					current->right->parent = parent;
-					delete current;
-					return ;
-				}
-				if (current->left && !current->right)
-				{
-					if (parent->right == current)
-						parent->right = current->left;
-					else
-						parent->left = current->left;
-					current->left->parent = parent;
-					delete current;
-					return ;
-				}
-				node_type next = (++iterator(current)).node();
-				/*if (!next)
-					next = (--iterator(current)).node();*/
-				pair<key_type, mapped_type>	tmp;
-				tmp = current->pair;
-				current->pair = next->pair;
-				next->pair = tmp;
-				remove_node(next);
+			std::allocator<BNode<key_type, mapped_type> >	alloc;
+			node_type parent = current->parent;
+			if (!current->left && !current->right)
+			{
+				if (parent->right == current)
+					parent->right = 0;
+				else
+					parent->left = 0;
+				alloc.deallocate(current, 1);
+				//delete current;
+				return ;
+			}
+			if (current->right && !current->left)
+			{
+				if (parent->right == current)
+					parent->right = current->right;
+				else
+					parent->left = current->right;
+				current->right->parent = parent;
+				alloc.deallocate(current, 1);
+				//delete current;
+				return ;
+			}
+			if (current->left && !current->right)
+			{
+				if (parent->right == current)
+					parent->right = current->left;
+				else
+					parent->left = current->left;
+				current->left->parent = parent;
+				alloc.deallocate(current, 1);
+				//delete current;
+				return ;
+			}
+			node_type next = (++iterator(current)).node();
+			/*if (!next)
+				next = (--iterator(current)).node();*/
+			pair<key_type, mapped_type>	tmp;
+			tmp = current->pair;
+			current->pair = next->pair;
+			next->pair = tmp;
+			remove_node(next);
 		}
 		void	free_tree(node_type current)
 		{
+			std::allocator<BNode<key_type, mapped_type> >	alloc;
 			if (current->left)
 				free_tree(current->left);
 			if (current->right)
 				free_tree(current->right);
-			delete current;
+			alloc.deallocate(current, 1);
+			//delete current;
 		}
 };
 	template <class Key, class T, class Compare, class Alloc>

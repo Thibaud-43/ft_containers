@@ -449,7 +449,22 @@ int main(void)
 		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
+	fs << "TEST MAKE PAIR" << std::endl << std::endl;
+	{
+		clock.setBeginFt();
+		ft::pair <int,int> foo;
+		ft::pair <int,int> bar;
 
+		foo = ft::make_pair (10,20);
+		bar = ft::make_pair (10.5,'A'); // ok: implicit conversion from pair<double,char>
+
+		fs << "foo: " << foo.first << ", " << foo.second << '\n';
+		fs << "bar: " << bar.first << ", " << bar.second << '\n';
+
+
+		clock.printFtTime();
+	}
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }
