@@ -606,6 +606,21 @@ int main(void)
 		clock.printStdTime();
 	}
 	fs << std::endl << std::endl;
+	fs << "NICO TEST" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		std::vector<std::vector<int> > v;
+		std::vector<int > v2(static_cast<size_t>(100), 42);
+		std::vector<int > v3(static_cast<size_t>(100), 42);
+		std::vector<int > v4(static_cast<size_t>(100), 42);
+		std::vector<int > v5(static_cast<size_t>(100), 42);
+		v.push_back(v2);
+		v.push_back(v3);
+		v.push_back(v4);
+		v.push_back(v5);
+		clock.printStdTime();
+	}
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }

@@ -1,0 +1,156 @@
+TEST CONSTRUCTORS
+
+The contents of fifth are: 16 2 77 29
+
+
+TEST EGAL
+
+Size of foo: 0
+Size of bar: 3
+
+
+TEST BEGIN ET END
+
+myvector contains: 1 2 3 4 5
+
+
+TEST RBEGIN ET REND
+
+myvector contains: 5 4 3 2 1
+
+
+TEST SIZE
+
+0. size: 0
+1. size: 10
+2. size: 20
+3. size: 19
+
+
+TEST MAX SIZE
+
+size: 100
+capacity: 128
+max_size: 4611686018427387903
+
+
+TEST RESIZE
+
+myvector contains: 1 2 3 4 5 100 100 100 0 0 0 0
+
+
+TEST CAPACITY
+
+size: 100
+capacity: 128
+max_size: -1
+
+
+TEST EMPTY
+
+total: 55
+
+
+TEST RESERVE
+
+making foo grow:
+capacity changed: 1
+capacity changed: 2
+capacity changed: 4
+capacity changed: 8
+capacity changed: 16
+capacity changed: 32
+capacity changed: 64
+capacity changed: 128
+making bar grow:
+capacity changed: 100
+
+
+TEST []
+
+myvector contains: 9 8 7 6 5 4 3 2 1 0
+
+
+TEST AT
+
+myvector contains: 0 1 2 3 4 5 6 7 8 9
+
+
+TEST FRONT
+
+myvector.front() is now 62
+
+
+TEST BACK
+
+myvector contains: 10 9 8 7 6 5 4 3 2 1 0
+
+
+TEST ASSIGN
+
+Size of first: 7
+Size of second: 5
+Size of third: 3
+Capacity of first: 7
+Capacity of second: 5
+Capacity of third: 3
+
+
+TEST PUSH BACK
+
+Please enter some integers (enter 0 to end):
+myvector stores 10 numbers.
+
+
+TEST POP BACK
+
+The elements of myvector add up to 600
+
+
+TEST INSERT
+
+myvector contains: 501 502 503 300 300 400 400 200 100 100 100
+
+
+TEST ERASE
+
+myvector contains: 4 5 7 8 9 10
+
+
+TEST SWAP
+
+foo contains: 200 200 200 200 200
+bar contains: 100 100 100
+
+
+TEST CLEAR
+
+myvector contains: 100 200 300
+myvector contains: 1101 2202
+
+
+TEST GET ALLOCATOR
+
+The allocated array contains: 0 1 2 3 4
+
+
+TEST RELATIONAL OPERATORS
+
+foo and bar are not equal
+foo is less than bar
+foo is less than or equal to bar
+
+
+TEST SWAP
+
+foo contains: 200 200 200 200 200
+bar contains: 100 100 100
+
+
+OTHER TEST
+
+1
+
+
+NICO TEST
+

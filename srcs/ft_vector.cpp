@@ -577,6 +577,21 @@ int main(void)
 		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
+	fs << "NICO TEST" << std::endl << std::endl;
+	{
+		clock.setBeginFt();
+		ft::vector<ft::vector<int> > v;
+		ft::vector<int > v2(static_cast<size_t>(100), 42);
+		ft::vector<int > v3(static_cast<size_t>(100), 42);
+		ft::vector<int > v4(static_cast<size_t>(100), 42);
+		ft::vector<int > v5(static_cast<size_t>(100), 42);
+		v.push_back(v2);
+		v.push_back(v3);
+		v.push_back(v4);
+		v.push_back(v5);
+		clock.printFtTime();
+	}
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }

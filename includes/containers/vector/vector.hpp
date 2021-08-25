@@ -63,7 +63,9 @@ public:
 
 	vector (const vector & x): m_data(NULL), m_size(0), m_capacity(0), m_alloc(x.m_alloc)
 	{
-		this->assign(x.begin(), x.end());
+		//this->assign(x.begin(), x.end());
+		reserve(x.m_capacity);
+		std::memcpy(static_cast<void*>(m_data), static_cast<void*>(x.m_data), x.m_size * sizeof(value_type));
 	}
 
 	~vector()
@@ -256,7 +258,8 @@ public:
 			reserve(amount);
 			m_capacity = amount;
 		}
-		m_data[m_size] = val;
+
+		m_data[m_size] = value_type(val);
 		m_size++;
 	}
 
@@ -286,7 +289,7 @@ public:
 			k--;
 		}
 
-		m_data[i] = val;
+		m_data[i] = value_type(val);
 		m_size++;
 		return (iterator(&m_data[i]));
 	}

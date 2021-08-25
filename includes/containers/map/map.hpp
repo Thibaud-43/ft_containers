@@ -104,18 +104,19 @@ public:
 				return comp(x.first, y.first);
 			}
 	};
-	typedef Alloc								allocator_type;
-	typedef	value_type	&						reference;
-	typedef	value_type const &					const_reference;
-	typedef	value_type	*						pointer;
-	typedef	value_type const *					const_pointer;
-	typedef MapIterator<key_type, mapped_type>	iterator;
-	typedef MapIterator<key_type, mapped_type> 	const_iterator;
-	typedef ReverseIterator<iterator> 			reverse_iterator;
-	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
-	typedef std::ptrdiff_t 						difference_type;
-	typedef	size_t								size_type;
-	typedef	BNode<key_type, mapped_type>*		node_type;
+	typedef Alloc											allocator_type;
+	typedef std::allocator<BNode<key_type, mapped_type> >	node_allocator_type;
+	typedef	value_type	&									reference;
+	typedef	value_type const &								const_reference;
+	typedef	value_type	*									pointer;
+	typedef	value_type const *								const_pointer;
+	typedef MapIterator<key_type, mapped_type>				iterator;
+	typedef MapIterator<key_type, mapped_type> 				const_iterator;
+	typedef ReverseIterator<iterator> 						reverse_iterator;
+	typedef ReverseIterator<const_iterator> 				const_reverse_iterator;
+	typedef std::ptrdiff_t 									difference_type;
+	typedef	size_t											size_type;
+	typedef	BNode<key_type, mapped_type>*					node_type;
 
 
 
@@ -124,23 +125,24 @@ public:
 ***********************************************************************************************************************************/
 
 	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-	:m_root(NULL), m_size(0), m_alloc(alloc), m_comp(comp)
+	:m_root(NULL), m_size(0), m_alloc(alloc), m_node_alloc(node_allocator_type()), m_comp(comp)
 	{
 		init();
 	}
 
 	template <class InputIterator>
-	map (InputIterator first, InputIterator last,
+	map (InputIterator first, 
+		typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last,
 		const key_compare& comp = key_compare(),
 		const allocator_type& alloc = allocator_type())
-		:m_root(NULL), m_size(0), m_alloc(alloc), m_comp(comp)
+		:m_root(NULL), m_size(0), m_alloc(alloc), m_node_alloc(node_allocator_type()), m_comp(comp)
 	{
 		init();
 		insert(first, last);
 	}
 
 	map (const map& x):
-	m_root(NULL), m_size(0), m_alloc(x.m_alloc), m_comp(x.m_comp)
+	m_root(NULL), m_size(0), m_alloc(x.m_alloc), m_node_alloc(node_allocator_type()), m_comp(x.m_comp)
 	{
 		init();
 		insert(x.begin(), x.end());
@@ -285,10 +287,9 @@ public:
 		}
 	}
 
-
-
 	template <class InputIterator>
-	void insert (InputIterator first, InputIterator last)
+	void insert (InputIterator first, 
+	typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last)
 	{
 		while (first != last)
 		{
@@ -450,11 +451,12 @@ public:
 ***********************************************************************************************************************************/
 	
 	private :
-		node_type		m_root;
-		node_type		m_end;
-		size_type		m_size;
-		allocator_type	m_alloc;
-		key_compare		m_comp;
+		node_type				m_root;
+		node_type				m_end;
+		size_type				m_size;
+		allocator_type			m_alloc;
+		node_allocator_type		m_node_alloc;
+		key_compare				m_comp;
 
 /***********************************************************************************************************************************
 *															EXTRA : BINARY TREE FUNCTON																
@@ -476,8 +478,7 @@ public:
 
 		node_type	create_node(value_type	pair, node_type parent, bool end = false, bool root = false)
 		{
-			std::allocator<BNode<key_type, mapped_type> >	alloc;
-			node_type elem = alloc.allocate(1);
+			node_type elem = m_node_alloc.allocate(1);
 			//node_type	elem = new	BNode<key_type, mapped_type>();
 
 			elem->pair = pair;
@@ -554,7 +555,7 @@ public:
 		}
 		void	remove_node(node_type current)
 		{
-			std::allocator<BNode<key_type, mapped_type> >	alloc;
+
 			node_type parent = current->parent;
 			if (!current->left && !current->right)
 			{
@@ -562,7 +563,7 @@ public:
 					parent->right = 0;
 				else
 					parent->left = 0;
-				alloc.deallocate(current, 1);
+				m_node_alloc.deallocate(current, 1);
 				//delete current;
 				return ;
 			}
@@ -573,7 +574,7 @@ public:
 				else
 					parent->left = current->right;
 				current->right->parent = parent;
-				alloc.deallocate(current, 1);
+				m_node_alloc.deallocate(current, 1);
 				//delete current;
 				return ;
 			}
@@ -584,7 +585,7 @@ public:
 				else
 					parent->left = current->left;
 				current->left->parent = parent;
-				alloc.deallocate(current, 1);
+				m_node_alloc.deallocate(current, 1);
 				//delete current;
 				return ;
 			}
@@ -604,7 +605,7 @@ public:
 				free_tree(current->left);
 			if (current->right)
 				free_tree(current->right);
-			alloc.deallocate(current, 1);
+			m_node_alloc.deallocate(current, 1);
 			//delete current;
 		}
 };
