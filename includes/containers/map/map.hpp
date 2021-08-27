@@ -132,7 +132,7 @@ public:
 
 	template <class InputIterator>
 	map (InputIterator first, 
-		typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last,
+		typename ft::enable_if<ft::is_iterator<InputIterator>::value, InputIterator>::type last,
 		const key_compare& comp = key_compare(),
 		const allocator_type& alloc = allocator_type())
 		:m_root(NULL), m_size(0), m_alloc(alloc), m_node_alloc(node_allocator_type()), m_comp(comp)
@@ -289,7 +289,7 @@ public:
 
 	template <class InputIterator>
 	void insert (InputIterator first, 
-	typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last)
+	typename ft::enable_if<ft::is_iterator<InputIterator>::value, InputIterator>::type last)
 	{
 		while (first != last)
 		{

@@ -4,6 +4,7 @@
 #include <VectorIterator.hpp>
 #include <ReverseIterator.hpp>
 #include <IteratorTraits.hpp>
+#include <is_integral.hpp>
 #include <string>
 #include <limits>
 #include <iostream>
@@ -44,6 +45,7 @@ public:
 
 	explicit vector (const allocator_type& alloc = allocator_type()): m_data(NULL), m_size(0), m_capacity(0), m_alloc(alloc)   
 	{
+
 	}
 
 	explicit vector (int n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): 
@@ -54,7 +56,7 @@ public:
 
 	template <class InputIterator>
     vector (InputIterator first, 
-	typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last, 
+	typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last, 
 	const allocator_type& alloc = allocator_type()):
 	m_data(NULL), m_size(0), m_capacity(0), m_alloc(alloc)
 	{
@@ -63,14 +65,13 @@ public:
 
 	vector (const vector & x): m_data(NULL), m_size(0), m_capacity(0), m_alloc(x.m_alloc)
 	{
-		//this->assign(x.begin(), x.end());
 		reserve(x.m_capacity);
 		std::memcpy(static_cast<void*>(m_data), static_cast<void*>(x.m_data), x.m_size * sizeof(value_type));
 	}
 
 	~vector()
 	{
-		m_alloc.deallocate(m_data, m_capacity);
+		this->clear();
 	};
 
 	vector &operator=(const vector &other)
@@ -170,11 +171,12 @@ public:
 		{
 			tmp = m_alloc.allocate(n);
 			for (size_t i = 0; i < m_size; i++)
-				tmp[i] = m_data[i];
+				m_alloc.construct(&tmp[i], m_data[i]);
 			m_alloc.deallocate(m_data, m_capacity);
 			m_data = tmp;
 			m_capacity = n;
 		}
+
 	}
 
 /***********************************************************************************************************************************
@@ -224,13 +226,13 @@ public:
 ***********************************************************************************************************************************/
 	
 	template <class InputIterator>
-	void assign (InputIterator first, typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last)
+	void assign (InputIterator first, typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last)
 	{
 		m_alloc.deallocate(m_data, m_capacity);
 		m_capacity = last - first;
 		m_size = 0;
 		m_data = m_alloc.allocate(m_capacity);
-		for (iterator it = first; it != last; it++)
+		for (InputIterator it = first; it != last; it++)
 		{
 			this->push_back(*it);
 		}
@@ -258,8 +260,7 @@ public:
 			reserve(amount);
 			m_capacity = amount;
 		}
-
-		m_data[m_size] = value_type(val);
+		m_alloc.construct(&m_data[m_size], val);
 		m_size++;
 	}
 
@@ -268,7 +269,8 @@ public:
 		if (m_size > 0)
 		{
 			m_size--;
-			m_data[m_size].~value_type();
+			m_alloc.destroy(&m_data[m_size]);
+			//m_data[m_size].~value_type();
 		}
 	}
 	iterator insert (iterator position, const value_type& val)
@@ -289,7 +291,7 @@ public:
 			k--;
 		}
 
-		m_data[i] = value_type(val);
+		m_data[i] = val;
 		m_size++;
 		return (iterator(&m_data[i]));
 	}
@@ -302,7 +304,7 @@ public:
 	}
 
 	template <class InputIterator>
-	void insert (iterator position, InputIterator first, typename ft::enable_if<is_iterator<InputIterator>::value, InputIterator>::type last)
+	void insert (iterator position, InputIterator first, typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last)
 	{
 		while (first != last)
 		{

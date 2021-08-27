@@ -621,6 +621,28 @@ int main(void)
 		clock.printStdTime();
 	}
 	fs << std::endl << std::endl;
+	fs << "NICO TEST2" << std::endl << std::endl;
+	{
+		clock.setBeginStd();
+		std::deque<int> q1;
+		q1.push_back(10);
+		q1.push_back(11);
+		q1.push_back(12);
+		q1.push_back(13);
+		std::deque<int>::reverse_iterator it = q1.rbegin();
+		std::deque<int>::reverse_iterator end = q1.rend();
+		std::vector<int> v(it, end);
+		for (std::vector<int>::iterator it = v.begin(); it != v.end(); it++)
+			fs << *it << ", ";
+		fs << std::endl;
+		std::vector<int>::iterator itv = v.begin();
+		v.insert(itv + 1, it, end - 1);
+		for (std::vector<int>::iterator it = v.begin(); it != v.end(); it++)
+			fs << *it << ", ";
+		fs << std::endl;
+		clock.printStdTime();
+	}
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }

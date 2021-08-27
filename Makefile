@@ -20,7 +20,7 @@ RM		= rm -rf
 
 SRCS_PATH			=	./srcs/
 OBJS_PATH			=	.objs/
-INC					= -I includes/iterators -I includes/containers/vector -I includes/containers/map -I includes/containers/stack 
+INC					= -I includes/iterators -I includes/containers/vector -I includes/containers/map -I includes/containers/stack -I includes/containers/utils 
 
 
 OBJS_VECTOR		= $(addprefix $(OBJS_PATH),$(SRCS_VECTOR:.cpp=.o))

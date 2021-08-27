@@ -1,6 +1,8 @@
 #include <vector.hpp>
 #include <ctime>
-#include <fstream> 
+#include <deque>
+#include <vector>
+#include <fstream>
 
 class Time
 {
@@ -589,6 +591,28 @@ int main(void)
 		v.push_back(v3);
 		v.push_back(v4);
 		v.push_back(v5);
+		clock.printFtTime();
+	}
+	fs << std::endl << std::endl;
+	fs << "NICO TEST2" << std::endl << std::endl;
+	{
+		clock.setBeginFt();
+		std::deque<int> q1;
+		q1.push_back(10);
+		q1.push_back(11);
+		q1.push_back(12);
+		q1.push_back(13);
+		std::deque<int>::reverse_iterator it = q1.rbegin();
+		std::deque<int>::reverse_iterator end = q1.rend();
+		ft::vector<int> v(it, end);
+		for (ft::vector<int>::iterator it = v.begin(); it != v.end(); it++)
+			fs << *it << ", ";
+		fs << std::endl;
+		ft::vector<int>::iterator itv = v.begin();
+		v.insert(itv + 1, it, end - 1);
+		for (ft::vector<int>::iterator it = v.begin(); it != v.end(); it++)
+			fs << *it << ", ";
+		fs << std::endl;
 		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
