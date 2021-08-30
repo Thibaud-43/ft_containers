@@ -5,9 +5,13 @@
 #include <limits>
 #include <iostream>
 #include <memory>
+#include <ConstVectorIterator.hpp>
 
 namespace ft
 {
+template<typename T>
+class ConstVectorIterator;
+
 template<typename T>
 class VectorIterator
 {
@@ -19,7 +23,7 @@ public:
 	typedef value_type const * 								const_pointer;
 	typedef value_type const & 								const_reference;
 	typedef std::ptrdiff_t									difference_type;
-	typedef std::forward_iterator_tag						iterator_category;
+	typedef std::bidirectional_iterator_tag						iterator_category;
 
 	VectorIterator(void): m_ptr(NULL)
 	{
@@ -27,16 +31,25 @@ public:
 	VectorIterator(pointer ptr): m_ptr(ptr)
 	{
 	}
-	VectorIterator(VectorIterator const & src): m_ptr(src.m_ptr)
+	VectorIterator(const VectorIterator  & src): m_ptr(src.m_ptr)
 	{
 	}
 	virtual ~VectorIterator()
 	{
 	}
-
+	pointer	base() const
+	{
+		return m_ptr;
+	}
 	VectorIterator & operator= (VectorIterator const & rhs) 
 	{
 		m_ptr = rhs.m_ptr;
+		return *this;
+	}
+
+	VectorIterator & operator=(ConstVectorIterator<value_type> const & rhs)
+	{
+		m_ptr = rhs.base();
 		return *this;
 	}
 	VectorIterator & operator++ (void) 
@@ -86,7 +99,26 @@ public:
 			return false;
 		return true;
 	}
-	VectorIterator &operator+=(int n)
+	bool			operator== (ConstVectorIterator<value_type> ptr) const
+	{
+		if (m_ptr == ptr.base())
+			return true;
+		return false;
+	}
+
+	bool operator==(pointer  rhs ){
+        return (this->m_ptr == rhs);
+    }
+	bool operator!=(pointer  rhs ){
+        return (this->m_ptr == rhs);
+    }
+	bool			operator!= (ConstVectorIterator<value_type> ptr) const
+	{
+		if (m_ptr == ptr.base())
+			return false;
+		return true;
+	}
+	VectorIterator &operator+=(difference_type n)
 	{
 		while (n < 0)
 		{
@@ -100,7 +132,7 @@ public:
 		}
 		return (*this);
 	};
-	VectorIterator &operator-=(int n)
+	VectorIterator &operator-=(difference_type n)
 	{
 
 		while (n > 0)
@@ -115,13 +147,21 @@ public:
 		}
 		return (*this);
 	};
-	VectorIterator operator+(int n) const
+	VectorIterator operator+(difference_type n) const
 	{
 		VectorIterator tmp(*this);
 		tmp += n;
 		return (tmp);
 	};
-	VectorIterator operator-(int n) const
+	friend VectorIterator operator+(difference_type n, VectorIterator & rhs)
+	{
+		return (rhs + n);
+	};
+	friend const VectorIterator operator+(difference_type n, const VectorIterator & rhs)
+	{
+		return (rhs + n);
+	};
+	VectorIterator operator-(difference_type n) const
 	{
 		VectorIterator tmp(*this);
 
@@ -132,9 +172,13 @@ public:
 	{
 		return m_ptr - rhs.m_ptr;
 	}
-	const_reference operator[](int nb) const 
+	std::ptrdiff_t	operator-(const VectorIterator & rhs) const
 	{
-		return (*(this->m_ptr + nb));
+		return m_ptr - rhs.m_ptr;
+	}
+	const_reference operator[](difference_type n) const 
+	{
+		return (*(this->m_ptr + n));
 	}
 	const_reference operator*() const 
 	{
@@ -159,6 +203,22 @@ public:
 	bool operator>=(VectorIterator const &other) const 
 	{
 		return (this->m_ptr >= other.m_ptr);
+	}
+	bool operator<(ConstVectorIterator<value_type> const &other) const 
+	{
+		return (this->m_ptr < other.base());
+	}
+	bool operator<=(ConstVectorIterator<value_type> const &other) const 
+	{
+		return (this->m_ptr <= other.base());
+	}
+	bool operator>(ConstVectorIterator<value_type> const &other) const 
+	{
+		return (this->m_ptr > other.base());
+	}
+	bool operator>=(ConstVectorIterator<value_type> const &other) const 
+	{
+		return (this->m_ptr >= other.base());
 	}
 	protected:
 		pointer		m_ptr;

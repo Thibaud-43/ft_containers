@@ -464,6 +464,7 @@ int main(void)
 		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
+
 	fs.close();
 	return 0;
 }

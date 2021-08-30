@@ -2,6 +2,7 @@
  #define Vector_HPP
 
 #include <VectorIterator.hpp>
+#include <ConstVectorIterator.hpp>
 #include <ReverseIterator.hpp>
 #include <IteratorTraits.hpp>
 #include <is_integral.hpp>
@@ -31,9 +32,9 @@ public:
 	typedef	value_type	*						pointer;
 	typedef	value_type const *					const_pointer;
 	typedef VectorIterator<value_type>			iterator;
-	typedef VectorIterator<value_type> 			const_iterator;
-	typedef ReverseIterator<iterator> 			reverse_iterator;
-	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
+	typedef ConstVectorIterator<value_type> 	const_iterator;
+	typedef ReverseIterator<value_type> 			reverse_iterator;
+	typedef ConstReverseIterator<value_type> 	const_reverse_iterator;
 	typedef std::ptrdiff_t 						difference_type;
 	typedef	size_t								size_type;
 
@@ -67,6 +68,7 @@ public:
 	{
 		reserve(x.m_capacity);
 		std::memcpy(static_cast<void*>(m_data), static_cast<void*>(x.m_data), x.m_size * sizeof(value_type));
+		m_size = x.size();
 	}
 
 	~vector()
@@ -76,12 +78,13 @@ public:
 
 	vector &operator=(const vector &other)
 	{
+
 		m_size = 0;
 		m_capacity = other.m_capacity;
 		m_alloc = other.m_alloc;
 		m_alloc.deallocate(m_data, m_capacity);
 		m_data = m_alloc.allocate(m_capacity);
-		for (iterator it = other.begin(); it != other.end(); it++)
+		for (const_iterator it = other.begin(); it != other.end(); it++)
 		{
 			this->push_back(*it);
 		}
@@ -91,14 +94,14 @@ public:
 /***********************************************************************************************************************************
 *															ITERATORS																
 ***********************************************************************************************************************************/
+	const_iterator	begin(void) const
+	{
+		return  const_iterator(m_data);
+	}
 
-	iterator	begin()
+	iterator	begin(void)
 	{
 		return iterator(m_data);
-	}
-	const_iterator	begin() const
-	{
-		return const_iterator(m_data);
 	}
 
 	iterator	end()
@@ -228,13 +231,19 @@ public:
 	template <class InputIterator>
 	void assign (InputIterator first, typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last)
 	{
+		InputIterator tmp = first;
 		m_alloc.deallocate(m_data, m_capacity);
-		m_capacity = last - first;
+		//m_capacity = last - first;
+		m_capacity = 0;
+		size_type	k = 0;
+		for ( ; tmp != last; tmp++)
+			k++;
 		m_size = 0;
-		m_data = m_alloc.allocate(m_capacity);
+		m_data = m_alloc.allocate(k);
 		for (InputIterator it = first; it != last; it++)
 		{
 			this->push_back(*it);
+			m_capacity++;
 		}
 	}
 

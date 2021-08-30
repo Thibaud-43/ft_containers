@@ -4,6 +4,7 @@
 #include <ReverseIterator.hpp>
 #include <IteratorTraits.hpp>
 #include <MapIterator.hpp>
+#include <is_integral.hpp>
 #include <string>
 #include <pair.hpp>
 #include <limits>
@@ -132,7 +133,7 @@ public:
 
 	template <class InputIterator>
 	map (InputIterator first, 
-		typename ft::enable_if<ft::is_iterator<InputIterator>::value, InputIterator>::type last,
+		typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last,
 		const key_compare& comp = key_compare(),
 		const allocator_type& alloc = allocator_type())
 		:m_root(NULL), m_size(0), m_alloc(alloc), m_node_alloc(node_allocator_type()), m_comp(comp)
@@ -289,7 +290,7 @@ public:
 
 	template <class InputIterator>
 	void insert (InputIterator first, 
-	typename ft::enable_if<ft::is_iterator<InputIterator>::value, InputIterator>::type last)
+	typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last)
 	{
 		while (first != last)
 		{
@@ -332,18 +333,10 @@ public:
 	void swap (map& x)
 	{
 		node_type		tmp = x.m_root;
-		//size_type		tmp_size	= x.size();
-		//key_compare		tmp_comp	= x.m_comp;
-		//allocator_type	tmp_alloc = x.m_alloc;
 	
 		x.m_root = this->m_root;
-		/*x.m_size = this->m_size;
-		x.m_alloc = this->m_alloc;
-		x.m_comp = this->m_comp;*/
+
 		this->m_root = tmp;
-		/*this->m_size = tmp_size;
-		this->m_alloc = tmp_alloc;
-		this->m_comp = tmp_comp;*/
 
 	}
 	void clear()
@@ -474,6 +467,7 @@ public:
 		{
 			m_root = create_node(value_type(key_type(), mapped_type()), NULL, false, true);
 			m_root->right = create_node(value_type(key_type(), mapped_type()), m_root, true);
+
 		}
 
 		node_type	create_node(value_type	pair, node_type parent, bool end = false, bool root = false)
