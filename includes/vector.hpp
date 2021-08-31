@@ -321,7 +321,6 @@ public:
 		{
 			reserve(m_size + static_cast<size_type>(n));
 		}
-		std::cout << position.base() << "|" << this->begin().base() << std::endl;
 		while (n--)
 			position = insert(position, val);
 		
