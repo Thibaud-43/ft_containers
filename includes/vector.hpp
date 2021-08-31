@@ -1,9 +1,9 @@
 #ifndef Vector_HPP
  #define Vector_HPP
 
-#include <VectorIterator.hpp>
-#include <ConstVectorIterator.hpp>
-#include <ReverseIterator.hpp>
+#include <VectorIterators.hpp>
+#include "RandomAccessIterators.hpp"
+#include <ReverseIterators.hpp>
 #include <IteratorTraits.hpp>
 #include <is_integral.hpp>
 #include <string>
@@ -32,9 +32,9 @@ public:
 	typedef	value_type	*						pointer;
 	typedef	value_type const *					const_pointer;
 	typedef VectorIterator<value_type>			iterator;
-	typedef ConstVectorIterator<value_type> 	const_iterator;
-	typedef ReverseIterator<value_type> 			reverse_iterator;
-	typedef ConstReverseIterator<value_type> 	const_reverse_iterator;
+	typedef ConstVectorIterator<value_type>		const_iterator;
+	typedef ReverseIterator<iterator> 			reverse_iterator;
+	typedef ReverseIterator<const_iterator> 	const_reverse_iterator;
 	typedef std::ptrdiff_t 						difference_type;
 	typedef	size_t								size_type;
 
@@ -80,9 +80,10 @@ public:
 	{
 
 		m_size = 0;
-		m_capacity = other.m_capacity;
-		m_alloc = other.m_alloc;
 		m_alloc.deallocate(m_data, m_capacity);
+		m_alloc = other.m_alloc;
+		if (other.m_size > m_capacity)
+			m_capacity = other.m_size;
 		m_data = m_alloc.allocate(m_capacity);
 		for (const_iterator it = other.begin(); it != other.end(); it++)
 		{
@@ -234,23 +235,25 @@ public:
 		InputIterator tmp = first;
 		m_alloc.deallocate(m_data, m_capacity);
 		//m_capacity = last - first;
-		m_capacity = 0;
 		size_type	k = 0;
 		for ( ; tmp != last; tmp++)
 			k++;
-		m_size = 0;
+		if (k > m_capacity)
+			m_capacity = k;
 		m_data = m_alloc.allocate(k);
+		m_size = 0;
 		for (InputIterator it = first; it != last; it++)
 		{
 			this->push_back(*it);
-			m_capacity++;
 		}
+
 	}
 
 	void assign (int n, const value_type& val)
 	{
 		m_alloc.deallocate(m_data, m_capacity);
-		m_capacity = n;
+		if (static_cast<size_type>(n) > m_capacity)	
+			m_capacity = static_cast<size_type>(n);
 		m_size = 0;
 		m_data = m_alloc.allocate(m_capacity);
 		for (int i = 0; i < n; i++)
@@ -285,28 +288,40 @@ public:
 	iterator insert (iterator position, const value_type& val)
 	{
 		size_type		i = 0;
-		iterator		it = begin();
-
+		size_type		amount = 0;
+		iterator		it = this->begin();
+		
 		while (it + i != position && i < m_size)
 			i++;
-		if (m_capacity < m_size + 1)
-			reserve(m_size + 1);
-
-		size_type	k = m_capacity - 1;
-
+		if (m_capacity <= m_size)
+		{
+			if (m_capacity == 0)
+				amount = 1;
+			else
+				amount = m_capacity * 2;
+			reserve(amount);
+			m_capacity = amount;
+		}
+		size_type	k = m_size;
 		while (k > i)
 		{
 			m_data[k] = m_data[k - 1];
 			k--;
 		}
-
 		m_data[i] = val;
+
 		m_size++;
+
 		return (iterator(&m_data[i]));
 	}
 
 	void insert (iterator position, int n, const value_type& val)
 	{
+		if (m_size + static_cast<size_type>(n) > m_capacity)
+		{
+			reserve(m_size + static_cast<size_type>(n));
+		}
+		std::cout << position.base() << "|" << this->begin().base() << std::endl;
 		while (n--)
 			position = insert(position, val);
 		
@@ -315,6 +330,12 @@ public:
 	template <class InputIterator>
 	void insert (iterator position, InputIterator first, typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last)
 	{
+		InputIterator tmp = first;
+		size_type	k = 0;
+		for ( ; tmp != last; tmp++)
+			k++;
+		if (m_size + k > m_capacity)
+			reserve(m_size + k);
 		while (first != last)
 		{
 			position = insert(position, (*first)) + 1;
@@ -418,6 +439,8 @@ public:
 			if (lhs[i] < rhs[i])
 				return true;
 		}
+		if (i != rhs.size())
+			return true;
 		return (rhs[i] != lhs[i]);
 	}
 

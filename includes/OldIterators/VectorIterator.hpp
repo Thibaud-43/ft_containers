@@ -23,24 +23,24 @@ public:
 	typedef value_type const * 								const_pointer;
 	typedef value_type const & 								const_reference;
 	typedef std::ptrdiff_t									difference_type;
-	typedef std::bidirectional_iterator_tag						iterator_category;
+	typedef std::bidirectional_iterator_tag					iterator_category;
 
-	VectorIterator(void): m_ptr(NULL)
+	VectorIterator(void): m_ptr(NULL)//, m_base(NULL)
 	{
 	}
-	VectorIterator(pointer ptr): m_ptr(ptr)
+	VectorIterator(pointer ptr): m_ptr(ptr)//, m_base(ptr)
 	{
 	}
-	VectorIterator(const VectorIterator  & src): m_ptr(src.m_ptr)
+	VectorIterator(const VectorIterator  & src): m_ptr(src.m_ptr)//, m_base(src.m_base)
 	{
 	}
 	virtual ~VectorIterator()
 	{
 	}
-	pointer	base() const
+	/*pointer	base() const
 	{
-		return m_ptr;
-	}
+		return m_base;
+	}*/
 	VectorIterator & operator= (VectorIterator const & rhs) 
 	{
 		m_ptr = rhs.m_ptr;
@@ -49,7 +49,8 @@ public:
 
 	VectorIterator & operator=(ConstVectorIterator<value_type> const & rhs)
 	{
-		m_ptr = rhs.base();
+		m_ptr = rhs.m_ptr;
+
 		return *this;
 	}
 	VectorIterator & operator++ (void) 
@@ -87,7 +88,7 @@ public:
 	{
 		return (*this->m_ptr);
 	}
-	bool			operator== (const VectorIterator ptr) const
+	bool			operator== (VectorIterator ptr) const
 	{
 		if (m_ptr == ptr.m_ptr)
 			return true;
@@ -95,13 +96,14 @@ public:
 	}
 	bool			operator!= (const VectorIterator ptr) const
 	{
+
 		if (m_ptr == ptr.m_ptr)
 			return false;
 		return true;
 	}
 	bool			operator== (ConstVectorIterator<value_type> ptr) const
 	{
-		if (m_ptr == ptr.base())
+		if (m_ptr == ptr.m_ptr)
 			return true;
 		return false;
 	}
@@ -114,7 +116,7 @@ public:
     }
 	bool			operator!= (ConstVectorIterator<value_type> ptr) const
 	{
-		if (m_ptr == ptr.base())
+		if (m_ptr == ptr.m_ptr)
 			return false;
 		return true;
 	}
@@ -172,6 +174,10 @@ public:
 	{
 		return m_ptr - rhs.m_ptr;
 	}
+	std::ptrdiff_t	operator-(ConstVectorIterator<T> & rhs) const
+	{
+		return m_ptr - rhs.m_ptr;
+	}
 	std::ptrdiff_t	operator-(const VectorIterator & rhs) const
 	{
 		return m_ptr - rhs.m_ptr;
@@ -206,22 +212,23 @@ public:
 	}
 	bool operator<(ConstVectorIterator<value_type> const &other) const 
 	{
-		return (this->m_ptr < other.base());
+		return (this->m_ptr < other.m_ptr);
 	}
 	bool operator<=(ConstVectorIterator<value_type> const &other) const 
 	{
-		return (this->m_ptr <= other.base());
+		return (this->m_ptr <= other.m_ptr);
 	}
 	bool operator>(ConstVectorIterator<value_type> const &other) const 
 	{
-		return (this->m_ptr > other.base());
+		return (this->m_ptr > other.m_ptr);
 	}
 	bool operator>=(ConstVectorIterator<value_type> const &other) const 
 	{
-		return (this->m_ptr >= other.base());
+		return (this->m_ptr >= other.m_ptr);
 	}
-	protected:
+	public:
 		pointer		m_ptr;
+		//pointer		m_base;
 };
 }
 
