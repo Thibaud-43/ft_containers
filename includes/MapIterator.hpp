@@ -11,26 +11,55 @@
 
 namespace ft
 {
-template <class  Key, class T>
-struct BNode;
 
-template <class Key, class T>
+template <typename T, typename node_type>
 class MapIterator
 {
-
+protected:
+	node_type		m_ptr;
+	MapIterator(node_type ptr): m_ptr(ptr) { };
 public:
-	typedef pair<Key, T> 									value_type;
+	typedef T												value_type;
+	typedef std::ptrdiff_t									difference_type;
 	typedef	value_type&										reference;
 	typedef	value_type*										pointer;
-	typedef value_type const * 								const_pointer;
-	typedef value_type const & 								const_reference;
-	typedef std::ptrdiff_t									difference_type;
 	typedef std::forward_iterator_tag						iterator_category;
+
+
+
+	MapIterator(void): m_ptr(NULL){}
+	MapIterator(MapIterator const & src) {*this = src;}
+	virtual ~MapIterator(){}
+	MapIterator & operator= (MapIterator const & rhs) {m_ptr = rhs.m_ptr;return (*this);}
+	
+	node_type	node()				{		return m_ptr;				}
+	template <class U> 
+	bool	operator==(const MapIterator<U, node_type> &rhs)  const {return(m_ptr == rhs.m_ptr);}
+	template <class U>
+	 bool	operator!=(const MapIterator<U, node_type> &rhs)  const {return(m_ptr != rhs.m_ptr); }
+
+	MapIterator & 	operator++ (void) 	{		m_increment();		return(*this);	}
+	MapIterator 	operator++ (int) 	{		MapIterator	tmp(*this);		this->operator++();		return(tmp);	}
+	MapIterator & 	operator-- (void) 	{		m_decrement();		return(*this);	}
+	MapIterator		operator--(int) 	{		MapIterator	tmp(*this);		this->operator--();		return(tmp);	}
+
+
+	reference		operator*(void)	const		{		return (this->m_ptr->pair);		}
+	pointer			operator->(void) const		{		return (&(this->operator*()));	}
+
+	operator MapIterator<const T, node_type>(void) const {
+			return MapIterator<const T, node_type>(this->m_ptr);
+		}
+
+	template <class, class, class, class>
+	friend class map;
+	template <class, class>
+		friend class MapIterator;
 
 private:
 	void	m_increment(void)
 	{
-		BNode<Key, T> *	tmp;
+		node_type	tmp;
 		if (m_ptr->right)
 		{
 			tmp = m_ptr->right;
@@ -48,7 +77,7 @@ private:
 	}
 	void	m_decrement(void)
 	{
-		BNode<Key, T> *	tmp;
+		node_type	tmp;
 		if (m_ptr->left)
 		{
 			tmp = m_ptr->left;
@@ -64,86 +93,6 @@ private:
 		}
 		m_ptr = tmp;
 	}
-public:
-
-	MapIterator(void): m_ptr(NULL)
-	{
-
-	}
-	MapIterator(BNode<Key, T> * ptr): m_ptr(ptr)
-	{
-
-	}
-	MapIterator(MapIterator const & src): m_ptr(src.m_ptr)
-	{
-
-	}
-	virtual ~MapIterator()
-	{
-
-	}
-
-	MapIterator & operator= (MapIterator const & rhs) 
-	{
-		m_ptr = rhs.m_ptr;
-		return (*this);
-	}
-	BNode<Key, T> *		node()
-	{
-		return m_ptr;
-	}
-	bool			operator== (const MapIterator ptr) const
-	{
-		return(m_ptr == ptr.m_ptr);
-	}
-	bool			operator!= (const MapIterator ptr) const
-	{
-		return (!(*this == ptr));
-	}
-
-	reference	operator*()
-	{
-		return (m_ptr->pair);
-	}
-	pointer	operator->()
-	{
-		return (&(m_ptr->pair));
-	}
-	const_reference	operator*() const
-	{
-		return (m_ptr->pair);
-	}
-	const_pointer	operator->() const
-	{
-		return (&(m_ptr->pair));
-	}
-	MapIterator & operator++ (void) 
-	{
-		m_increment();
-		return(*this);
-	}
-	MapIterator 	operator++ (int) 
-	{
-		MapIterator	tmp(*this);
-		this->operator++();
-		return(tmp);
-	}
-	MapIterator & operator-- (void) 
-	{
-		m_decrement();
-		return(*this);
-	}
-	MapIterator	operator--(int) 
-	{
-		MapIterator	tmp(*this);
-		this->operator--();
-		return(tmp);
-
-	}
-
-
-	protected:
-		BNode<Key, T> *		m_ptr;
 };
 }
 

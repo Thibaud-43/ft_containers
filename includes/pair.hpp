@@ -13,7 +13,7 @@ namespace ft
         first_type	        first;
         second_type	        second;
     public:
-        pair():first(T1()), second(T2())
+        pair():first(), second()
         {
 
         }
@@ -29,10 +29,6 @@ namespace ft
         {
 
         }
-        /*~pair()
-		{
-		}*/
-
         pair & operator= (const pair& pr)
         {
             this->first = pr.first;

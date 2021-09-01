@@ -2,11 +2,11 @@
  #define MAP_H
 
 #include "ReverseIterators.hpp"
-#include <IteratorTraits.hpp>
-#include <MapIterator.hpp>
-#include <is_integral.hpp>
+#include "IteratorTraits.hpp"
+#include "MapIterator.hpp"
+#include "is_integral.hpp"
 #include <string>
-#include <pair.hpp>
+#include "pair.hpp"
 #include <limits>
 #include <iostream>
 #include <memory>
@@ -58,21 +58,27 @@ struct less : binary_function <T,T,bool>
 	}
 };
 
-template <class  Key, class T>
+template <typename T>
 struct BNode
 {
-	pair<Key, T> 		pair;
-	BNode 				*left;
-	BNode 				*right;
-	BNode 				*parent;
+	template <typename>
+	struct Bnode;
+	T					pair;
+	BNode 			*left;
+	BNode			*right;
+	BNode			*parent;
 	bool 				end;
 	bool				root;
+	BNode(T lpair, BNode* lparent, bool lend, bool lroot): pair(lpair), left(NULL), right(NULL), parent(lparent), end(lend), root(lroot)
+	{
+
+	}
 };
 
 template < class Key,                                     		// map::key_type
            class T,                                       		// map::mapped_type
            class Compare = ft::less<Key>,                     	// map::key_compare
-           class Alloc = std::allocator<pair<const Key,T> >    // map::allocator_type
+           class Alloc = std::allocator<ft::pair<const Key,T> >    // map::allocator_type
            >
 class map
 {
@@ -82,42 +88,38 @@ public:
 /***********************************************************************************************************************************
 *															TYPEDEF																
 ***********************************************************************************************************************************/
-	
+
 	typedef	Key									key_type;
 	typedef T									mapped_type;
-	typedef pair<const Key, T> 					value_type;
+	typedef ft::pair< Key, T> 				value_type;
 	typedef	Compare								key_compare;
+	typedef	BNode<value_type>*					node_type;
+
 	class 	value_compare
 	{   
-		class map;
-		protected:
-			Compare comp;
-			value_compare (Compare c) : comp(c) 
-			{
-
-			}
 		public:
-			typedef bool result_type;
-			typedef value_type first_argument_type;
-			typedef value_type second_argument_type;
-			bool operator() (const value_type& x, const value_type& y) const
-			{
-				return comp(x.first, y.first);
-			}
+		Compare comp;
+		value_compare(Compare c) : comp(c) { };
+
+		typedef bool		result_type;
+		typedef value_type	first_argument_type;
+		typedef value_type	second_argument_type;
+		bool	operator()(const value_type &x, const value_type &y) const {
+			return comp(x.first, y.first);
+		}
 	};
 	typedef Alloc											allocator_type;
-	typedef std::allocator<BNode<key_type, mapped_type> >	node_allocator_type;
+	typedef std::allocator<BNode<value_type> >	node_allocator_type;
 	typedef	value_type	&									reference;
 	typedef	value_type const &								const_reference;
 	typedef	value_type	*									pointer;
 	typedef	value_type const *								const_pointer;
-	typedef MapIterator<key_type, mapped_type>				iterator;
-	typedef MapIterator<key_type, mapped_type> 				const_iterator;
+	typedef MapIterator<value_type, node_type>				iterator;
+	typedef MapIterator<const value_type, node_type> 		const_iterator;
 	typedef ReverseIterator<iterator> 						reverse_iterator;
 	typedef ReverseIterator<const_iterator> 				const_reverse_iterator;
 	typedef std::ptrdiff_t 									difference_type;
 	typedef	size_t											size_type;
-	typedef	BNode<key_type, mapped_type>*					node_type;
 
 
 
@@ -238,7 +240,7 @@ public:
 	}
 	size_type max_size(void) const
 	{
-		return (m_alloc.max_size());
+		return (m_node_alloc.max_size());
 	};
 
 /***********************************************************************************************************************************
@@ -266,7 +268,9 @@ public:
 	{
 		node_type	tmp = find_key(val.first, m_root);
 		if (tmp)
+		{
 			return(pair<iterator, bool>(iterator(tmp), false));
+		}
 		else
 		{
 			m_size++;
@@ -354,7 +358,7 @@ public:
 	}
 	value_compare value_comp() const
 	{
-		return this->value_compare;
+		return (value_compare(key_compare()));
 	}
 
 /***********************************************************************************************************************************
@@ -473,16 +477,19 @@ public:
 		node_type	create_node(value_type	pair, node_type parent, bool end = false, bool root = false)
 		{
 			node_type elem = m_node_alloc.allocate(1);
+			BNode<value_type>	tmp(pair, parent, end, root);
+			m_node_alloc.construct(elem, tmp);
 			//node_type	elem = new	BNode<key_type, mapped_type>();
-
-			elem->pair = pair;
+			/*elem->pair = pair;
 			elem->parent = parent;
 			elem->right = NULL;
 			elem->left = NULL;
 			elem->root = root;
-			elem->end = end;
+			elem->end = end;*/
 			return elem;
 		}
+
+
 		node_type		find_key(key_type key, node_type current) const
 		{
 			node_type	ret1 = NULL;
@@ -558,7 +565,6 @@ public:
 				else
 					parent->left = 0;
 				m_node_alloc.deallocate(current, 1);
-				//delete current;
 				return ;
 			}
 			if (current->right && !current->left)
@@ -569,7 +575,6 @@ public:
 					parent->left = current->right;
 				current->right->parent = parent;
 				m_node_alloc.deallocate(current, 1);
-				//delete current;
 				return ;
 			}
 			if (current->left && !current->right)
@@ -580,21 +585,24 @@ public:
 					parent->left = current->left;
 				current->left->parent = parent;
 				m_node_alloc.deallocate(current, 1);
-				//delete current;
 				return ;
 			}
+
 			node_type next = (++iterator(current)).node();
-			/*if (!next)
-				next = (--iterator(current)).node();*/
+	
 			pair<key_type, mapped_type>	tmp;
 			tmp = current->pair;
 			current->pair = next->pair;
 			next->pair = tmp;
+
 			remove_node(next);
 		}
+
+
+
 		void	free_tree(node_type current)
 		{
-			std::allocator<BNode<key_type, mapped_type> >	alloc;
+			std::allocator<BNode<value_type> >	alloc;
 			if (current->left)
 				free_tree(current->left);
 			if (current->right)
