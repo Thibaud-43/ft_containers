@@ -7,6 +7,7 @@
 #include <IteratorTraits.hpp>
 #include <is_integral.hpp>
 #include <string>
+#include <string.h>
 #include <limits>
 #include <iostream>
 #include <memory>
@@ -67,7 +68,7 @@ public:
 	vector (const vector & x): m_data(NULL), m_size(0), m_capacity(0), m_alloc(x.m_alloc)
 	{
 		reserve(x.m_capacity);
-		std::memcpy(static_cast<void*>(m_data), static_cast<void*>(x.m_data), x.m_size * sizeof(value_type));
+		memcpy(static_cast<void*>(m_data), static_cast<void*>(x.m_data), x.m_size * sizeof(value_type));
 		m_size = x.size();
 	}
 
@@ -148,6 +149,15 @@ public:
 
 	void resize (size_type n, value_type val = value_type())
 	{
+		if (n > m_size * 2)
+		{
+			reserve(n);
+		}
+		else if (n > m_capacity)
+		{
+			reserve(m_size*2);
+		}
+		
 		while (n < m_size)
 			pop_back();
 		while(n > m_size)
@@ -287,59 +297,52 @@ public:
 	}
 	iterator insert (iterator position, const value_type& val)
 	{
-		size_type		i = 0;
-		size_type		amount = 0;
-		iterator		it = this->begin();
-		
-		while (it + i != position && i < m_size)
-			i++;
-		if (m_capacity <= m_size)
-		{
-			if (m_capacity == 0)
-				amount = 1;
-			else
-				amount = m_capacity * 2;
-			reserve(amount);
-			m_capacity = amount;
-		}
-		size_type	k = m_size;
-		while (k > i)
-		{
-			m_data[k] = m_data[k - 1];
-			k--;
-		}
-		m_data[i] = val;
+		difference_type diff = position - this->begin();
 
-		m_size++;
-
-		return (iterator(&m_data[i]));
+		this->insert(position, 1, val);
+		return (iterator(this->begin() + diff));
 	}
 
 	void insert (iterator position, int n, const value_type& val)
 	{
-		if (m_size + static_cast<size_type>(n) > m_capacity)
-		{
-			reserve(m_size + static_cast<size_type>(n));
-		}
-		while (n--)
-			position = insert(position, val);
-		
+		difference_type const	idx = position - this->begin();
+		difference_type const	old_end_idx = this->end() - this->begin();
+		iterator				old_end, end;
+
+		this->resize(this->m_size + n);
+
+		end = this->end();
+		position = this->begin() + idx;
+		old_end = this->begin() + old_end_idx;
+		while (old_end != position)
+			*--end = *--old_end;
+		while (n-- > 0)
+			*position++ = val;
 	}
 
 	template <class InputIterator>
 	void insert (iterator position, InputIterator first, typename ft::enable_if<ft::is_iterator<InputIterator>::value && (!ft::is_integral<InputIterator>::value), InputIterator>::type last)
 	{
-		InputIterator tmp = first;
-		size_type	k = 0;
-		for ( ; tmp != last; tmp++)
-			k++;
-		if (m_size + k > m_capacity)
-			reserve(m_size + k);
-		while (first != last)
+		difference_type const	idx = position - this->begin();
+		difference_type const	old_end_idx = this->end() - this->begin();
+		iterator				old_end, end;
+		InputIterator			tmp = first;
+		size_type				k = 0;
+
+		while (tmp!= last)
 		{
-			position = insert(position, (*first)) + 1;
-			++first;
+			k++;
+			tmp++;
 		}
+		this->resize(this->m_size + k);
+
+		end = this->end();
+		position = this->begin() + idx;
+		old_end = this->begin() + old_end_idx;
+		while (old_end != position)
+			*--end = *--old_end;
+		while (first != last)
+			*position++ = *first++;
 	}
 	iterator erase (iterator position)
 	{
@@ -347,17 +350,26 @@ public:
 	}
 	iterator erase (iterator first, iterator last)
 	{
-		size_type		posToInsert = 0;
-		for (iterator i = begin(); i != first; i++)
-			posToInsert++;
-		size_type		nb = 0;
-		for (iterator i = first; i != last; i++)
-			nb++;
-		for (size_type i = 0; i < m_size - nb; i++)
-			m_data[i + posToInsert] = m_data[i + posToInsert + nb];
-		for(size_type i = 0; i < nb; i++)
+		iterator	tmp = first;
+		iterator 	end = this->end();
+		iterator	tmp2 = first;
+		size_type	k = 0;
+
+		while (tmp2!= last)
+		{
+			k++;
+			tmp2++;
+		}
+		while (last != end)
+		{
+			*first = *last;
+			++first;
+			++last;
+		}
+		while (k-- > 0)
 			pop_back();
-		return (begin() + posToInsert);
+			///this->_alloc.destroy(&this->_data[--this->_size]);
+		return (tmp);
 	}
 
 	void swap (vector& x)

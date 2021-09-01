@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <deque>
 #include <fstream> 
 
 class Time
