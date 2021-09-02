@@ -59,7 +59,7 @@ public:
 private:
 	void	m_increment(void)
 	{
-		node_type	tmp;
+		node_type	tmp = NULL;
 		if (m_ptr->right)
 		{
 			tmp = m_ptr->right;

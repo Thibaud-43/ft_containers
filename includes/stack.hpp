@@ -53,11 +53,11 @@ public:
 		}
 		value_type& top()
 		{
-			return m_container[m_container.size() - 1];
+			return m_container.back();
 		}
 		const value_type& top() const
 		{
-			return m_container[m_container.size() - 1];
+			return m_container.back();
 		}
 		void push (const value_type& val)
 		{
@@ -66,6 +66,16 @@ public:
 		void pop()
 		{
 			m_container.pop_back();
+		}
+		friend
+		bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		{
+			return (lhs.m_container == rhs.m_container);
+		}
+		friend
+		bool operator<  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		{
+			return (lhs.m_container < rhs.m_container);
 		}
 /***********************************************************************************************************************************
 *															PRIVATE ATTRIBUTES																
@@ -81,36 +91,28 @@ public:
 *															Non-member function overloads																
 ***********************************************************************************************************************************/
 
-	template <class T, class Container>
-	bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
-	{
-		return (lhs == rhs);
-	}
+
 	template <class T, class Container>
 	bool operator!= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
 	{
-		return (lhs != rhs);
+		return (!(lhs == rhs));
 
 	}
-	template <class T, class Container>
-	bool operator<  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
-	{
-		return (lhs < rhs);
-	}
+
 	template <class T, class Container>
 	bool operator<= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
 	{
-		return (lhs <= rhs);
+		return !(rhs < lhs);
 	}
 	template <class T, class Container>
 	bool operator>  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
 	{
-		return (lhs > rhs);
+		return (rhs < lhs);
 	}
 	template <class T, class Container>
 	bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
 	{
-		return (lhs >= rhs);
+		return !(lhs < rhs);
 	}
 }
 #endif

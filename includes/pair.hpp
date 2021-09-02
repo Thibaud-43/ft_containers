@@ -54,11 +54,7 @@ namespace ft
     template <class T1, class T2>
     bool operator<  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
     {
-        if (lhs.first < rhs.first)
-            return true;
-        if (rhs.first < lhs.first && lhs.second < rhs.second)
-            return true;
-        return false;
+		return lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second);
     }
 
     template <class T1, class T2>

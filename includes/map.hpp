@@ -167,43 +167,30 @@ public:
 
 	iterator begin()
 	{
-		node_type n = m_root;
-		if (!n->left && !n->right)
-			return (iterator(n));
-		if (!n->left && n->right)
-			n = n->right;
-		while (n->left)
-			n = n->left;
-		return (iterator(n));
+		return (++iterator(m_root));
 	}
 	const_iterator begin() const
 	{
-		node_type n = m_root;
-		if (!n->left && !n->right)
-			return (const_iterator(n));
-		if (!n->left && n->right)
-			n = n->right;
-		while (n->left)
-			n = n->left;
-		return (const_iterator(n));
+
+		iterator	it(m_root);
+		it++;
+		return (const_iterator(it.node()));
 	}
 	iterator end()
 	{
-		node_type n = m_root;
-		if (!n->left && !n->right)
-			return (iterator(n));
-		while (!n->end)
-			n = n->right;
-		return (iterator(n));
+
+		iterator n(m_root);
+		while (!(n).node()->end)
+			n++;
+		return (n);
 	}
 	const_iterator end() const
 	{
-		node_type n = m_root;
-		if (!n->left && !n->right)
-			return (const_iterator(n));
-		while (!n->end)
-			n = n->right;
-		return (const_iterator(n));
+
+		iterator n(m_root);
+		while (!(n).node()->end)
+			n++;
+		return (const_iterator(n.node()));
 	}
 	reverse_iterator rbegin()
 	{
@@ -267,7 +254,7 @@ public:
 	pair<iterator,bool> insert (const value_type& val)
 	{
 		node_type	tmp = find_key(val.first, m_root);
-		if (tmp)
+		if (tmp && tmp != m_root)
 		{
 			return(pair<iterator, bool>(iterator(tmp), false));
 		}
@@ -282,13 +269,14 @@ public:
 
 	iterator insert (iterator position, const value_type& val)
 	{
+		static_cast<void>(position);
 		node_type	tmp = find_key(val.first, m_root);
-		if (tmp)
+		if (tmp && tmp != m_root)
 			return(tmp);
 		else
 		{
 			m_size++;
-			return (iterator(add_node(val, position.node())));
+			return (iterator(add_node(val, m_root)));
 		}
 	}
 
@@ -309,8 +297,7 @@ public:
 	void erase (iterator position)
 	{
 
-		remove_node(position.node());
-		m_size--;
+		this->erase(position++, position);
 	}
 
 
@@ -321,7 +308,8 @@ public:
 		node_type	elem;
 		while ((elem = find_key(k, m_root)))
 		{
-			erase(iterator(elem));
+			remove_node(elem);
+			m_size--;
 			++count;
 		};
 		return (count);
@@ -332,20 +320,29 @@ public:
 	void erase (iterator first, iterator last)
 	{
 		while (first != last)
-			erase(first++);
+		{
+			remove_node((first++).node());
+			m_size--;
+		}
+
 	}
 	void swap (map& x)
 	{
 		node_type		tmp = x.m_root;
+		size_type		tmp2 = x.m_size;
 	
 		x.m_root = this->m_root;
-
+		x.m_size = this->m_size;
 		this->m_root = tmp;
+		this->m_size = tmp2;
 
 	}
 	void clear()
 	{	
-		erase(begin(), end());
+		//erase(begin(), end());
+		m_size = 0;
+		free_tree(m_root);
+		init();
 	}
 
 /***********************************************************************************************************************************
@@ -367,11 +364,15 @@ public:
 	iterator find (const key_type& k)
 	{
 		node_type	tmp = find_key(k, m_root);
+		if (!tmp)
+			return (this->end());
 		return(iterator(tmp));
 	}
 	const_iterator find (const key_type& k) const
 	{
 		node_type	tmp = find_key(k, m_root);
+		if (!tmp)
+			return (this->end());
 		return(const_iterator(tmp));
 	}
 	size_type count (const key_type& k) const
@@ -463,7 +464,14 @@ public:
 			if (!n)
 				return;
 			print_tree(n->left);
-			std::cout << n->pair.first << "=" << n->pair.second << std::endl;
+			if(n->root)
+				std::cout << "root" << std::endl;
+			else if(n->end)
+			{
+				std::cout << "[END]" << n->pair.first << "=" << n->pair.second << std::endl;
+			}
+			else
+				std::cout << n->pair.first << "=" << n->pair.second << std::endl;
 			print_tree(n->right);
 		};
 
@@ -479,13 +487,6 @@ public:
 			node_type elem = m_node_alloc.allocate(1);
 			BNode<value_type>	tmp(pair, parent, end, root);
 			m_node_alloc.construct(elem, tmp);
-			//node_type	elem = new	BNode<key_type, mapped_type>();
-			/*elem->pair = pair;
-			elem->parent = parent;
-			elem->right = NULL;
-			elem->left = NULL;
-			elem->root = root;
-			elem->end = end;*/
 			return elem;
 		}
 
@@ -494,6 +495,10 @@ public:
 		{
 			node_type	ret1 = NULL;
 			node_type	ret2 = NULL;
+			if (current->end)
+				return NULL;
+			if (current == m_root)
+				return find_key(key, current->right);
 			if (current->left)
 				ret1 = find_key(key, current->left);
 			if (current->right)
@@ -515,7 +520,17 @@ public:
 		}
 		node_type		add_node(pair<key_type, mapped_type> pair, node_type current)
 		{
-			if (pair.first > current->pair.first)
+			if (current->root && current->right->end)
+			{
+				node_type	tmp = current->right;
+				current->right = create_node(pair, current);
+				current->right->right = tmp;
+				current->right->right->parent = current->right;
+				return(current->right);
+			}
+			else if (current->root)
+				return add_node(pair, current->right);
+			else if (m_comp(current->pair.first, pair.first))
 			{
 				if(current->right && !current->right->end)
 				{
@@ -546,9 +561,8 @@ public:
 				}
 				else
 				{
-					current->left = create_node(pair, current, true);
+					current->left = create_node(pair, current, false);
 					return(current->left);
-
 				}
 				
 			}
@@ -556,14 +570,15 @@ public:
 		}
 		void	remove_node(node_type current)
 		{
-
 			node_type parent = current->parent;
+	
 			if (!current->left && !current->right)
 			{
 				if (parent->right == current)
 					parent->right = 0;
 				else
 					parent->left = 0;
+				m_node_alloc.destroy(current);
 				m_node_alloc.deallocate(current, 1);
 				return ;
 			}
@@ -574,6 +589,7 @@ public:
 				else
 					parent->left = current->right;
 				current->right->parent = parent;
+				m_node_alloc.destroy(current);
 				m_node_alloc.deallocate(current, 1);
 				return ;
 			}
@@ -584,6 +600,7 @@ public:
 				else
 					parent->left = current->left;
 				current->left->parent = parent;
+				m_node_alloc.destroy(current);
 				m_node_alloc.deallocate(current, 1);
 				return ;
 			}
@@ -602,13 +619,12 @@ public:
 
 		void	free_tree(node_type current)
 		{
-			std::allocator<BNode<value_type> >	alloc;
 			if (current->left)
 				free_tree(current->left);
 			if (current->right)
 				free_tree(current->right);
+			m_node_alloc.destroy(current);
 			m_node_alloc.deallocate(current, 1);
-			//delete current;
 		}
 };
 	template <class Key, class T, class Compare, class Alloc>
@@ -620,17 +636,8 @@ public:
 	bool operator==(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
 	{
 		if (lhs.size() != rhs.size())
-			return (false);
-		typename ft::map<Key, T, Compare, Alloc>::const_iterator it = rhs.begin();
-		typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = lhs.begin();
-		while (it != rhs.end())
-		{
-			if (*it != *it2)
-				return (false);
-			++it2;
-			++it;
-		}
-		return (true);
+			return false;
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	};
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator!=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
@@ -638,14 +645,14 @@ public:
 		return (!(lhs == rhs));
 	};
 	template <class Key, class T, class Compare, class Alloc>
-	bool operator>(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	bool operator<(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
 	{
 		return(lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 	};
 	template <class Key, class T, class Compare, class Alloc>
-	bool operator<(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+	bool operator>(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
 	{
-		return (!(lhs > rhs) && !(lhs == rhs));
+		return (rhs < lhs);
 	};
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator>=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
@@ -655,7 +662,7 @@ public:
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator<=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
 	{
-		return (!(lhs > rhs));
+		return (!(rhs < lhs));
 	};
 
 }
