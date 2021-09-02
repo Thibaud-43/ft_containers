@@ -59,15 +59,11 @@ int main(void)
 		clock.setBeginFt();
 		ft::map<char,int> first;
 		first['d']=5;
-		/*first['a']=10;
+		first['a']=10;
 		first['b']=30;
-		first['c']=50;*/
+		first['c']=50;
 
-		ft::map<char, int>::iterator	it = first.begin();
-		ft::map<char, int>::iterator	ite = first.end();
-		first.erase(it, ite);
-
-		/*fs << "first contains:\n";
+		fs << "first contains:\n";
 		ft::map<char,int>::iterator it = first.begin();
 		for (it=first.begin(); it!=first.end(); ++it)
 			fs << it->first << " => " << it->second << '\n';
@@ -79,12 +75,11 @@ int main(void)
 
 		bool(*fn_pt)(char,char) = fncomp;
 		ft::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
-*/
 		clock.printFtTime();
 	}
 	fs << std::endl << std::endl;
 
-	/*fs << "TEST =" << std::endl << std::endl;
+	fs << "TEST =" << std::endl << std::endl;
 	{
 		clock.setBeginFt();
 		ft::map<char,int> first;
@@ -468,7 +463,7 @@ int main(void)
 
 		clock.printFtTime();
 	}
-	fs << std::endl << std::endl;*/
+	fs << std::endl << std::endl;
 	fs.close();
 	return 0;
 }
