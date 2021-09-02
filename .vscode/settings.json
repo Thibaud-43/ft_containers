@@ -74,6 +74,7 @@
 		"ratio": "cpp",
 		"stack": "cpp",
 		"queue": "cpp",
-		"filesystem": "cpp"
+		"filesystem": "cpp",
+		"__functional_03": "cpp"
 	}
 }

@@ -75,6 +75,7 @@ public:
 	~vector()
 	{
 		this->clear();
+		m_alloc.deallocate(m_data, m_capacity);
 	};
 
 	vector &operator=(const vector &other)
@@ -185,7 +186,10 @@ public:
 		{
 			tmp = m_alloc.allocate(n);
 			for (size_t i = 0; i < m_size; i++)
+			{
 				m_alloc.construct(&tmp[i], m_data[i]);
+				m_alloc.destroy(&m_data[i]);
+			}
 			m_alloc.deallocate(m_data, m_capacity);
 			m_data = tmp;
 			m_capacity = n;
@@ -244,7 +248,6 @@ public:
 	{
 		InputIterator tmp = first;
 		m_alloc.deallocate(m_data, m_capacity);
-		//m_capacity = last - first;
 		size_type	k = 0;
 		for ( ; tmp != last; tmp++)
 			k++;
@@ -292,7 +295,6 @@ public:
 		{
 			m_size--;
 			m_alloc.destroy(&m_data[m_size]);
-			//m_data[m_size].~value_type();
 		}
 	}
 	iterator insert (iterator position, const value_type& val)
@@ -368,7 +370,6 @@ public:
 		}
 		while (k-- > 0)
 			pop_back();
-			///this->_alloc.destroy(&this->_data[--this->_size]);
 		return (tmp);
 	}
 
